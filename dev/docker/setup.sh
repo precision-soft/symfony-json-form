@@ -11,7 +11,7 @@ INITIAL_SETUP_MARKER="/setup.initial.done"
 if [[ ! -e ${INITIAL_SETUP_MARKER} ]]; then
     echo 'Initial setup starting ...'
 
-    #scomposer install
+    scomposer install
 
     echo 'Initial setup done'
 
