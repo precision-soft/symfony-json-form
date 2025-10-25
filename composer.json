@@ -1,7 +1,7 @@
 {
     "name": "precision-soft/symfony-json-form",
     "type": "symfony-bundle",
-    "version": "v1.0.1",
+    "version": "v1.0.2",
     "description": "forms that serialize to json for frontend frameworks with symfony api backends",
     "keywords": [
         "symfony",

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "956812462a0776486b2edcf05d591e84",
+    "content-hash": "fe2603428cde1d3475f95a30c868226b",
     "packages": [
         {
             "name": "symfony/deprecation-contracts",
@@ -1570,16 +1570,16 @@
         },
         {
             "name": "precision-soft/symfony-phpunit",
-            "version": "v1.0.0",
+            "version": "v1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://gitlab.com/precision-soft-open-source/symfony/phpunit.git",
-                "reference": "c60b92210f1422bb155d2b3560f121b19e4366a2"
+                "reference": "b84637497b934aa44d98e5c1694f276feb12ce45"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://gitlab.com/api/v4/projects/precision-soft-open-source%2Fsymfony%2Fphpunit/repository/archive.zip?sha=c60b92210f1422bb155d2b3560f121b19e4366a2",
-                "reference": "c60b92210f1422bb155d2b3560f121b19e4366a2",
+                "url": "https://gitlab.com/api/v4/projects/precision-soft-open-source%2Fsymfony%2Fphpunit/repository/archive.zip?sha=b84637497b934aa44d98e5c1694f276feb12ce45",
+                "reference": "b84637497b934aa44d98e5c1694f276feb12ce45",
                 "shasum": ""
             },
             "require": {
@@ -1619,9 +1619,9 @@
             ],
             "support": {
                 "issues": "https://gitlab.com/precision-soft-open-source/symfony/phpunit/-/issues",
-                "source": "https://gitlab.com/precision-soft-open-source/symfony/phpunit/-/tree/v1.0.0"
+                "source": "https://gitlab.com/precision-soft-open-source/symfony/phpunit/-/tree/v1.0.1"
             },
-            "time": "2024-09-17T15:25:12+00:00"
+            "time": "2025-10-25T17:20:07+00:00"
         },
         {
             "name": "psr/container",

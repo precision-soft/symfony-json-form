@@ -65,7 +65,7 @@ abstract class AbstractFormService
 
     public function handleRequest(
         Request $request,
-        DtoInterface $dto = null,
+        ?DtoInterface $dto = null,
         bool $sanitizeData = true,
     ): DtoInterface {
         [$data, $context] = $this->getDataAndContext($request);
