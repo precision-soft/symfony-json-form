@@ -38,7 +38,7 @@ abstract class AbstractFormService
         return $this;
     }
 
-    public function render(DtoInterface $dto = null): array
+    public function render(?DtoInterface $dto = null): array
     {
         if (null === $dto) {
             $dtoClass = $this->getDtoClass();
