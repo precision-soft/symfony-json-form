@@ -52,8 +52,6 @@ class ArrayElement extends AbstractElement
             $value = (array)$value;
 
             if (false === empty($diff = \array_diff($value, $this->getOptionsValues()))) {
-                \print_r([$value, $this->getOptionsValues()]);
-
                 throw new InvalidValueException($this->getName(), $diff);
             }
             /* @todo add more validations */

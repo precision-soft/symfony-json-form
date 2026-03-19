@@ -39,7 +39,7 @@ class DateElement extends AbstractElement
 
     protected function renderElement(mixed $value): array
     {
-        if (null !== $value && false === \is_string($value) && false === DateTime::createFromFormat($this->format, $value)) {
+        if (null !== $value && (false === \is_string($value) || false === DateTime::createFromFormat($this->format, $value))) {
             throw new InvalidValueException($this->getName(), $value);
         }
 
