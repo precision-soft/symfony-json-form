@@ -1,12 +1,7 @@
-'use strict';
-
 import {Box, Button as ButtonBase} from '@mui/material';
-/** external libraries */
 import React from 'react';
 import {buttonErrorOutlined, resetSecondary, submitPrimaryOutlined} from '../component/Button';
 import Icon from '../component/Icon';
-
-/** internal components */
 import LanguageContext from '../context/LanguageContext';
 import logger from '../service/Logger';
 import {NullaryType} from '../type/Function';
@@ -49,7 +44,7 @@ export const FormButtons: React.FunctionComponent<FormButtonsProps> = (props) =>
                                                 onClick={() => {
                                                     props.form.resetForm();
 
-                                                    onClick && onClick();
+                                                    null !== onClick && onClick();
                                                 }}
                                     >
                                         {icon}{languageContext.translate(label)}
@@ -59,7 +54,7 @@ export const FormButtons: React.FunctionComponent<FormButtonsProps> = (props) =>
                                 return (
                                     <ButtonBase key={type}
                                                 {...buttonErrorOutlined}
-                                                onClick={() => onClick && onClick()}
+                                                onClick={() => null !== onClick && onClick()}
                                     >
                                         {icon}{languageContext.translate(label)}
                                     </ButtonBase>

@@ -1,5 +1,3 @@
-'use strict';
-
 import {SelectChangeEvent} from '@mui/material/Select/SelectInput';
 import {AutocompleteChangeDetails, AutocompleteChangeReason} from '@mui/material/useAutocomplete';
 import {FormikProps, FormikValues} from 'formik';
@@ -81,7 +79,6 @@ export type FormFieldRenderPropsType = FocusType & {
     onChange?: (event: OnChangeEventType, value: OnChangeValueType) => void
     className?: string
     elements?: FormFieldsRenderPropsType
-    /** @todo modify this to a custom component */
     prototypeCollectionRender?: PrototypeCollectionRenderType
     checkboxCheckedIcon?: React.ReactElement
     checkboxIcon?: React.ReactElement

@@ -10,17 +10,17 @@ namespace PrecisionSoft\Symfony\JsonForm\Form;
 
 use PrecisionSoft\Symfony\JsonForm\Trait\ElementCollectionTrait;
 
-final class Form
+class Form
 {
     use ElementCollectionTrait;
 
     public function __construct(
-        private readonly string $name,
-        private readonly string $method,
-        private readonly Action $action,
+        protected readonly string $name,
+        protected readonly string $method,
+        protected readonly Action $action,
     ) {}
 
-    public function render($data): array
+    public function render(array $data): array
     {
         return [
             'name' => $this->name,

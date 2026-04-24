@@ -1,7 +1,4 @@
-'use strict';
-
 import {FormControl as FormControlBase} from '@mui/material';
-/** external libraries */
 import React from 'react';
 
 type FormControlProps = React.PropsWithChildren & {

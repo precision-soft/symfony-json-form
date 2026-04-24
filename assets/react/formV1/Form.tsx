@@ -1,14 +1,8 @@
-'use strict';
-
 import '../css/form.scss';
 import {Box} from '@mui/material';
 import {Form as FormBase, Formik, useFormikContext} from 'formik';
-
-/** external libraries */
 import React from 'react';
-
-/** internal components */
-import BlockUi from '../component/BlockUi';
+import {BlockUi} from '../component/BlockUi';
 import {HttpRequest, useHttpClient} from '../service/HttpClient';
 import useUrlGenerator from '../service/UrlGenerator';
 import {NullaryType, SetLoadingType} from '../type/Function';
@@ -90,7 +84,7 @@ const InnerForm: React.FunctionComponent<InnerFormProps> = (props) => {
     }
 
     const classNames = ['form-container'];
-    if (props.containerClassName !== undefined) {
+    if (undefined !== props.containerClassName) {
         classNames.push(props.containerClassName);
     }
 
@@ -103,7 +97,7 @@ const InnerForm: React.FunctionComponent<InnerFormProps> = (props) => {
         >
             <Box className={classNames.join(' ')}>
                 <BlockUi open={props.loading}
-                         className={['h-100 w-100' + (props.loadingClassName ? props.loadingClassName : '')].join(' ')}
+                         className={['h-100 w-100' + (null !== props.loadingClassName ? props.loadingClassName : '')].join(' ')}
                 >
                     <FormBase name={props.name}
                               onSubmit={form.handleSubmit}
@@ -130,9 +124,9 @@ type FormProps = SharedFormProps & {
 }
 
 export const Form: React.FunctionComponent<FormProps> = (props) => {
-    const blockOnSubmit: boolean = props.blockOnSubmit === undefined ? true : props.blockOnSubmit;
+    const blockOnSubmit: boolean = undefined === props.blockOnSubmit ? true : props.blockOnSubmit;
 
-    const enableReinitialize: boolean = props.enableReinitialize === undefined ? false : props.enableReinitialize;
+    const enableReinitialize: boolean = undefined === props.enableReinitialize ? false : props.enableReinitialize;
 
     const [loading, setLoadingState] = React.useState<boolean>(false);
     const setLoading: SetLoadingType = (loading) => blockOnSubmit === true && setLoadingState(loading);
@@ -145,12 +139,12 @@ export const Form: React.FunctionComponent<FormProps> = (props) => {
             urlGenerator.generate(props.data.action.route, props.data.action.parameters),
             (response) => {
                 if (response.success === false) {
-                    props.onSubmitFailure !== undefined && props.onSubmitFailure(response.errors);
+                    undefined !== props.onSubmitFailure && props.onSubmitFailure(response.errors);
 
                     return;
                 }
 
-                props.onSubmitSuccess !== undefined && props.onSubmitSuccess(values, response.data);
+                undefined !== props.onSubmitSuccess && props.onSubmitSuccess(values, response.data);
             },
             props.data.method
         ))
@@ -163,11 +157,11 @@ export const Form: React.FunctionComponent<FormProps> = (props) => {
             .setBeforeSend(() => {
                 setLoading(true);
 
-                props.beforeSend !== undefined && props.beforeSend();
+                undefined !== props.beforeSend && props.beforeSend();
             })
-            .setOnError(() => props.onSubmitFailure !== undefined && props.onSubmitFailure())
+            .setOnError(() => undefined !== props.onSubmitFailure && props.onSubmitFailure())
             .setOnComplete(() => {
-                props.onComplete !== undefined && props.onComplete();
+                undefined !== props.onComplete && props.onComplete();
 
                 setSubmitting(false);
 

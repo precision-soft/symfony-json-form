@@ -1,5 +1,3 @@
-'use strict';
-
 import {Autocomplete as AutocompleteBase, TextField as TextFieldBase} from '@mui/material';
 import {AutocompleteInputChangeReason, AutocompleteValue as AutocompleteValueBase} from '@mui/material/useAutocomplete';
 import React from 'react';
@@ -42,11 +40,11 @@ export const AutocompleteField: React.FunctionComponent<AutocompleteFieldProps> 
 
         httpRequest.current?.abort();
 
-        if (reason === 'reset' && multiple == true) {
+        if (reason === 'reset' && true === multiple) {
             return;
         }
 
-        if (value && value.length > 2) {
+        if (null !== value && 2 < value.length) {
             httpRequest.current = new HttpRequest(
                 urlGenerator.generate(props.route, {[props.routeParameter]: value}),
                 (response) => {
@@ -83,8 +81,6 @@ export const AutocompleteField: React.FunctionComponent<AutocompleteFieldProps> 
         props.onChange(event as OnChangeEventType, value);
     };
 
-    /** @todo autofocus */
-
     return (
         <AutocompleteBase<AutocompleteFieldOptionType | AutocompleteFieldOptionType[], boolean, boolean, boolean>
             multiple={multiple}
@@ -97,11 +93,11 @@ export const AutocompleteField: React.FunctionComponent<AutocompleteFieldProps> 
             defaultValue={initialValue}
             onChange={onChange}
             onInputChange={onInputChange}
-            getOptionLabel={(option: AutocompleteFieldOptionType) => option ? option.label : ''}
+            getOptionLabel={(option: AutocompleteFieldOptionType) => null !== option ? option.label : ''}
             autoHighlight={true}
             isOptionEqualToValue={(option: AutocompleteFieldOptionType, value: AutocompleteFieldOptionType) => option.id === value.id}
-            renderInput={(params) => (
-                <TextFieldBase {...params}
+            renderInput={(renderInputParameters) => (
+                <TextFieldBase {...renderInputParameters}
                                label={props.label}
                                required={props.required}
                                fullWidth

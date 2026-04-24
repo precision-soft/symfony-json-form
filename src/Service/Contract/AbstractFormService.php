@@ -21,7 +21,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 abstract class AbstractFormService
 {
-    private SerializerInterface $serializer;
+    protected SerializerInterface $serializer;
 
     abstract protected function getDtoClass(): string;
 
@@ -31,7 +31,7 @@ abstract class AbstractFormService
 
     abstract protected function build(Form $form, DtoInterface $dto): void;
 
-    public function setSerializer(SerializerInterface $serializer): self
+    public function setSerializer(SerializerInterface $serializer): static
     {
         $this->serializer = $serializer;
 
@@ -58,7 +58,7 @@ abstract class AbstractFormService
 
         $this->build($form, $dto);
 
-        $data = $this->serializer->normalize($dto);
+        $data = (array)$this->serializer->normalize($dto);
 
         return $form->render($data);
     }
@@ -93,7 +93,6 @@ abstract class AbstractFormService
             case Request::METHOD_POST:
             case Request::METHOD_PUT:
             case Request::METHOD_PATCH:
-                /** @todo handle based on request type */
                 $requestContent = $request->getContent();
                 if (false === empty($requestContent)) {
                     $data = (new JsonEncoder())->decode($requestContent, JsonEncoder::FORMAT);

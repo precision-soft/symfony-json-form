@@ -17,7 +17,7 @@ trait ReadonlyTrait
         return $this->readonly;
     }
 
-    public function setReadonly(bool $readonly): self
+    public function setReadonly(bool $readonly): static
     {
         $this->readonly = $readonly;
 

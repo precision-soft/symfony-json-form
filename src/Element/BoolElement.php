@@ -13,7 +13,6 @@ use PrecisionSoft\Symfony\JsonForm\Element\Trait\ReadonlyTrait;
 use PrecisionSoft\Symfony\JsonForm\Element\Trait\RequiredTrait;
 use PrecisionSoft\Symfony\JsonForm\Exception\InvalidValueException;
 
-/** checkbox html element */
 class BoolElement extends AbstractElement
 {
     use ReadonlyTrait;

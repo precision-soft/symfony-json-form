@@ -13,7 +13,6 @@ use PrecisionSoft\Symfony\JsonForm\Element\Trait\ReadonlyTrait;
 use PrecisionSoft\Symfony\JsonForm\Element\Trait\RequiredTrait;
 use PrecisionSoft\Symfony\JsonForm\Exception\InvalidValueException;
 
-/** base text input html element */
 class StringElement extends AbstractElement
 {
     use ReadonlyTrait;

@@ -14,7 +14,6 @@ use PrecisionSoft\Symfony\JsonForm\Element\Trait\RequiredTrait;
 use PrecisionSoft\Symfony\JsonForm\Exception\InvalidModeException;
 use PrecisionSoft\Symfony\JsonForm\Exception\InvalidValueException;
 
-/** select html element */
 class ArrayElement extends AbstractElement
 {
     use ReadonlyTrait;
@@ -51,10 +50,11 @@ class ArrayElement extends AbstractElement
         if (null !== $value) {
             $value = (array)$value;
 
-            if (false === empty($diff = \array_diff($value, $this->getOptionsValues()))) {
+            $diff = \array_diff($value, $this->getOptionsValues());
+
+            if (false === empty($diff)) {
                 throw new InvalidValueException($this->getName(), $diff);
             }
-            /* @todo add more validations */
         }
 
         return [
@@ -66,7 +66,7 @@ class ArrayElement extends AbstractElement
         ];
     }
 
-    private function getOptionsValues(): array
+    protected function getOptionsValues(): array
     {
         $optionsValues = [];
 

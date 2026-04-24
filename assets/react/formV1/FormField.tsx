@@ -1,13 +1,8 @@
-'use strict';
-
 import {Box, Checkbox, FormControlLabel} from '@mui/material';
 import {FastField, FieldArray, FormikValues} from 'formik';
-/** external libraries */
 import React from 'react';
 import LanguageContext from '../context/LanguageContext';
 import Exception from '../exception/Exception';
-
-/** internal components */
 import {StringArrayType} from '../type/Array';
 import {BooleanRefType} from '../type/React';
 import {NullableNumberType, NullableStringType} from '../type/Scalar';
@@ -34,22 +29,22 @@ export const FormField: React.FunctionComponent<FormFieldProps> = (props) => {
     const defaultAutoFocus = React.useRef<boolean>(false);
 
     const buildName = (element: ElementType, parents: StringArrayType): string => {
-        const prefix = parents === undefined ? [] : parents;
+        const prefix = undefined === parents ? [] : parents;
 
         return [...prefix, element.name].join('.');
     };
 
     const formControlClassNames: StringArrayType = ['form-control'];
-    if (props.renderProps?.formControlClassName !== undefined) {
+    if (undefined !== props.renderProps?.formControlClassName) {
         formControlClassNames.push(props.renderProps?.formControlClassName);
     }
 
     const name: string = buildName(props.element, props.parents);
-    const label: NullableStringType = props.element.label ? languageContext.translate(props.element.label) : null;
-    const readonly: boolean = (props.element.readonly !== undefined ? props.element.readonly : false) || props.form.isSubmitting;
-    const required: boolean = props.element.required !== undefined ? props.element.required : false;
-    const autoFocus: BooleanRefType = props.renderProps?.autoFocus !== undefined ? props.renderProps.autoFocus : defaultAutoFocus;
-    const selectOnFocus: boolean = props.renderProps?.selectOnFocus !== undefined ? props.renderProps.selectOnFocus : false;
+    const label: NullableStringType = null !== props.element.label ? languageContext.translate(props.element.label) : null;
+    const readonly: boolean = (undefined !== props.element.readonly ? props.element.readonly : false) || props.form.isSubmitting;
+    const required: boolean = undefined !== props.element.required ? props.element.required : false;
+    const autoFocus: BooleanRefType = undefined !== props.renderProps?.autoFocus ? props.renderProps.autoFocus : defaultAutoFocus;
+    const selectOnFocus: boolean = undefined !== props.renderProps?.selectOnFocus ? props.renderProps.selectOnFocus : false;
     const onChange: OnChangeCallbackType = (event, value) => {
         let processedValue = undefined;
 
@@ -57,18 +52,18 @@ export const FormField: React.FunctionComponent<FormFieldProps> = (props) => {
             case ElementTypeEnum.ARRAY:
                 switch (props.element.mode) {
                     case ElementModeEnum.SINGLE:
-                        processedValue = value ? value.id : null;
+                        processedValue = null !== value ? value.id : null;
                         break;
                 }
                 break;
             case ElementTypeEnum.AUTOCOMPLETE:
                 processedValue = [];
 
-                if (value) {
-                    if (value.id !== undefined) {
+                if (null !== value) {
+                    if (undefined !== value.id) {
                         processedValue.push(value.id);
                     } else if (Array.isArray(value) === true) {
-                        value.map(v => processedValue.push(v.id));
+                        value.map(selectedOption => processedValue.push(selectedOption.id));
                     } else {
                         throw new Exception(`invalid value for "${name}"`);
                     }
@@ -86,20 +81,20 @@ export const FormField: React.FunctionComponent<FormFieldProps> = (props) => {
                 break;
         }
 
-        if (processedValue !== undefined) {
+        if (undefined !== processedValue) {
             props.form.setFieldValue(name, processedValue);
         } else {
             props.form.handleChange(event);
         }
 
-        props.renderProps?.onChange && props.renderProps.onChange(
+        null !== props.renderProps?.onChange && props.renderProps.onChange(
             event,
             processedValue !== undefined ? processedValue : event.target.value
         );
     };
-    const error: boolean = props.form.touched[name] && Boolean(props.form.errors[name]);
-    const helperText = props.form.touched[name] && props.form.errors[name];
-    const elementClassName: string = props.renderProps?.className !== undefined ? ' ' + props.renderProps.className : '';
+    const error: boolean = true === props.form.touched[name] && Boolean(props.form.errors[name]);
+    const helperText = true === props.form.touched[name] && props.form.errors[name];
+    const elementClassName: string = undefined !== props.renderProps?.className ? ' ' + props.renderProps.className : '';
 
     switch (props.element.type) {
         case ElementTypeEnum.ARRAY:
@@ -174,7 +169,7 @@ export const FormField: React.FunctionComponent<FormFieldProps> = (props) => {
         case ElementTypeEnum.COLLECTION:
             formControlClassNames.push('col-10');
 
-            if (props.callbacks !== undefined) {
+            if (undefined !== props.callbacks) {
                 props.callbacks.elements = {};
             }
 
@@ -297,7 +292,7 @@ export const FormField: React.FunctionComponent<FormFieldProps> = (props) => {
                                      required={required}
                                      className={formControlClassNames.join(' ')}
                         >
-                            {props.value ? props.value : label}
+                            {null !== props.value ? props.value : label}
                         </FormControl>
                     )}
                 </FastField>
@@ -352,9 +347,8 @@ export const FormField: React.FunctionComponent<FormFieldProps> = (props) => {
                 </FastField>
             );
         case ElementTypeEnum.PROTOTYPE_COLLECTION:
-            /** @todo use context in place of callbacks */
             const renderPrototypeCollection = (arrayHelpers) => {
-                if (props.callbacks !== undefined) {
+                if (undefined !== props.callbacks) {
                     const findByKey = (key: unknown): [NullableNumberType, FormikValues | null] => {
                         for (const [index, elementValues] of props.value.entries()) {
                             if (elementValues[props.element.key] === key) {
@@ -376,7 +370,7 @@ export const FormField: React.FunctionComponent<FormFieldProps> = (props) => {
                     };
 
                     props.callbacks.get = (key) => {
-                        const [_, elementValues] = findByKey(key);
+                        const [unusedIndex, elementValues] = findByKey(key);
 
                         return elementValues;
                     };
@@ -459,13 +453,13 @@ type FormFieldsProps = {
 }
 
 export const FormFields: React.FunctionComponent<FormFieldsProps> = (props) => {
-    const parents: StringArrayType = props.parents === undefined ? [] : props.parents;
+    const parents: StringArrayType = undefined === props.parents ? [] : props.parents;
     const values: FormikValues = FormBuilder.getNestedValuesByPath(props.form.values, parents);
 
     return (
-        <>
+        <React.Fragment>
             {Object.entries(props.elements).map(([, element]) => {
-                    if (props.callbacks !== undefined) {
+                    if (undefined !== props.callbacks) {
                         props.callbacks[element.name] = {};
                     }
 
@@ -473,7 +467,7 @@ export const FormFields: React.FunctionComponent<FormFieldsProps> = (props) => {
                         <FormField key={element.name}
                                    form={props.form}
                                    element={element}
-                                   value={values?.[element.name] !== undefined ? values?.[element.name] : ''}
+                                   value={undefined !== values?.[element.name] ? values?.[element.name] : ''}
                                    renderProps={props.renderProps?.[element.name]}
                                    callbacks={props.callbacks?.[element.name]}
                                    parents={parents}
@@ -481,7 +475,7 @@ export const FormFields: React.FunctionComponent<FormFieldsProps> = (props) => {
                     );
                 }
             )}
-        </>
+        </React.Fragment>
     );
 };
 
@@ -491,7 +485,7 @@ type FormFieldsContainerProps = React.PropsWithChildren & {
 
 export const FormFieldsContainer: React.FunctionComponent<FormFieldsContainerProps> = (props) => {
     const classNames: StringArrayType = ['form-fields-container', 'd-flex flex-wrap gap-1 align-items-center'];
-    if (props.className !== undefined) {
+    if (undefined !== props.className) {
         classNames.push(props.className);
     }
 

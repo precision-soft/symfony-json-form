@@ -1,5 +1,3 @@
-'use strict';
-
 import {Box, Button} from '@mui/material';
 import React from 'react';
 import {buttonErrorOutlined, resetSecondary, submitPrimaryOutlined} from '../component/Button';
@@ -45,7 +43,7 @@ export const FormButton: React.FunctionComponent<FormButtonProps> = (props) => {
                                             onClick={() => {
                                                 formContext.form.resetForm();
 
-                                                onClick && onClick();
+                                                null !== onClick && onClick();
                                             }}
                                     >
                                         {icon}{languageContext.translate(label)}
@@ -55,7 +53,7 @@ export const FormButton: React.FunctionComponent<FormButtonProps> = (props) => {
                                 return (
                                     <Button key={type}
                                             {...buttonErrorOutlined}
-                                            onClick={() => onClick && onClick()}
+                                            onClick={() => null !== onClick && onClick()}
                                     >
                                         {icon}{languageContext.translate(label)}
                                     </Button>

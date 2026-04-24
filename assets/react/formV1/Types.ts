@@ -1,8 +1,5 @@
-'use strict';
-
 import {AutocompleteChangeDetails, AutocompleteChangeReason} from '@mui/base/AutocompleteUnstyled/useAutocomplete';
 import {SelectChangeEvent} from '@mui/material/Select/SelectInput';
-/** external libraries */
 import {FormikProps, FormikValues} from 'formik';
 import React from 'react';
 import {HttpRequestTypeEnum} from '../service/HttpClient';
@@ -10,8 +7,6 @@ import {StringArrayType} from '../type/Array';
 import {NullaryType} from '../type/Function';
 import {MapType, NullableMapType} from '../type/Map';
 import {BooleanRefType} from '../type/React';
-
-/** internal components */
 import {StringNumberType} from '../type/Scalar';
 
 export enum ElementTypeEnum {

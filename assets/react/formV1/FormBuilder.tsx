@@ -1,13 +1,8 @@
-'use strict';
-
-/** external libraries */
 import {Box} from '@mui/material';
 import {FastField, FormikValues} from 'formik';
 import React from 'react';
 import {clone} from '../service/Uility';
 import {StringArrayType} from '../type/Array';
-
-/** internal components */
 import {MapType} from '../type/Map';
 import {StringNumberType} from '../type/Scalar';
 import {FormFields} from './FormField';
@@ -46,16 +41,16 @@ export class FormBuilder {
                     case ElementTypeEnum.ARRAY:
                         switch (element.mode) {
                             case ElementModeEnum.SINGLE:
-                                const value = element.value ? element.value : null;
+                                const value = null !== element.value ? element.value : null;
 
-                                initialValues[name] = value && element.value.length > 0 ? element.value[0] : null;
+                                initialValues[name] = null !== value && 0 < element.value.length ? element.value[0] : null;
                                 break;
                             default:
-                                initialValues[name] = element.value ? element.value : [];
+                                initialValues[name] = null !== element.value ? element.value : [];
                         }
                         break;
                     case ElementTypeEnum.BOOL:
-                        initialValues[name] = element.value ? element.value : false;
+                        initialValues[name] = null !== element.value ? element.value : false;
                         break;
                     case ElementTypeEnum.COLLECTION:
                         initialValues[name] = FormBuilder.computeInitialValues(element.elements as ElementListType);
@@ -74,7 +69,7 @@ export class FormBuilder {
                         );
                         break;
                     default:
-                        initialValues[name] = element.value ? element.value : '';
+                        initialValues[name] = null !== element.value ? element.value : '';
                 }
             }
         );
@@ -83,7 +78,7 @@ export class FormBuilder {
     };
 
     static initCallbacks = (callbacks: FormCallbacksType): void => {
-        if (callbacks === undefined) {
+        if (undefined === callbacks) {
             return;
         }
 
@@ -108,14 +103,14 @@ export class FormBuilder {
         callbacks: FormFieldCallbacksType
     ) => {
         const collectionElements: PrototypeCollectionType[] = [];
-        values.map((v, index) => collectionElements.push({
-            key: v[element.key],
+        values.map((itemData, index) => collectionElements.push({
+            key: itemData[element.key],
             parents: [...parents, element.name, index]
         }));
 
         const elements = clone<ElementListType>(element.prototype);
 
-        if (renderProps?.prototypeCollectionRender) {
+        if (undefined !== renderProps?.prototypeCollectionRender) {
             collectionElements.map((collectionElement) => {
                 collectionElement.values = FormBuilder.getNestedValuesByPath(form.values, collectionElement.parents);
             });
@@ -164,14 +159,14 @@ export class FormBuilder {
     };
 
     static getNestedValuesByPath = (values: FormikValues, path?: StringArrayType): FormikValues => {
-        if (path === undefined || path.length === 0) {
+        if (undefined === path || 0 === path.length) {
             return values;
         }
 
         let result: FormikValues = values;
 
         for (let i = 0; i < path.length; i++) {
-            if (result === undefined) {
+            if (undefined === result) {
                 break;
             }
 

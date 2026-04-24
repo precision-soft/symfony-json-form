@@ -13,10 +13,10 @@ use PrecisionSoft\Symfony\JsonForm\Exception\Exception;
 
 trait ElementCollectionTrait
 {
-    /** @var AbstractElement[] */
-    private array $elements = [];
+    /** @var AbstractElement[] $elements */
+    protected array $elements = [];
 
-    public function addElement(AbstractElement $element): self
+    public function addElement(AbstractElement $element): static
     {
         if (true === isset($this->elements[$element->getName()])) {
             throw new Exception(\sprintf('duplicate element name `%s`', $element->getName()));
@@ -27,7 +27,7 @@ trait ElementCollectionTrait
         return $this;
     }
 
-    private function renderElements(array $value): array
+    protected function renderElements(array $value): array
     {
         $elements = [];
 

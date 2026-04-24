@@ -8,11 +8,11 @@ declare(strict_types=1);
 
 namespace PrecisionSoft\Symfony\JsonForm\Form;
 
-final class Action
+class Action
 {
     public function __construct(
-        private readonly string $route,
-        private readonly ?array $parameters = null,
+        protected readonly string $route,
+        protected readonly ?array $parameters = null,
     ) {}
 
     public function render(): array

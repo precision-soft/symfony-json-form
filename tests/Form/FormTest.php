@@ -49,10 +49,10 @@ final class FormTest extends TestCase
 
     private function getSerializer(): Serializer
     {
-        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+        $propertyInfoExtractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $normalizers = [
             new ArrayDenormalizer(),
-            new ObjectNormalizer(null, null, null, $extractor),
+            new ObjectNormalizer(null, null, null, $propertyInfoExtractor),
         ];
 
         $encoders = [new JsonEncoder()];

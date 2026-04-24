@@ -58,7 +58,7 @@ class TestForm extends AbstractFormService
                     'autocomplete',
                     'autocomplete label',
                     'autocomplete-route',
-                    ArrayElement::MODE_SINGLE,
+                    AutocompleteElement::MODE_SINGLE,
                 ),
             )
             ->addElement(new BoolElement('bool', 'bool label'))

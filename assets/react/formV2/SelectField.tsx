@@ -1,5 +1,3 @@
-'use strict';
-
 import {Autocomplete as AutocompleteBase, Box, Checkbox, Chip, InputLabel, ListItemText, ListSubheader, MenuItem, OutlinedInput, Select, TextField as TextFieldBase} from '@mui/material';
 import {AutocompleteValue as AutocompleteValueBase} from '@mui/material/useAutocomplete';
 import React from 'react';
@@ -69,7 +67,7 @@ export const SelectField: React.FunctionComponent<SelectFieldProps> = (props) =>
     switch (props.mode) {
         case ElementModeEnum.SINGLE:
             let value: AutocompleteValueBase<SelectFieldOptionType, false, boolean, boolean>;
-            if (props.value && processedOptions.indexed[props.value] !== undefined) {
+            if (null !== props.value && undefined !== processedOptions.indexed[props.value]) {
                 value = {
                     id: props.value,
                     label: processedOptions.indexed[props.value],
@@ -81,7 +79,7 @@ export const SelectField: React.FunctionComponent<SelectFieldProps> = (props) =>
                 <AutocompleteBase<SelectFieldOptionType, false, boolean, boolean>
                     multiple={false}
                     id={props.name}
-                    value={value ? value : null}
+                    value={null !== value ? value : null}
                     options={processedOptions.grouped}
                     groupBy={(option) => processedOptions.groupBy === true ? option.key : null}
                     getOptionLabel={(option: SelectFieldOptionType) => option.label}
@@ -113,7 +111,7 @@ export const SelectField: React.FunctionComponent<SelectFieldProps> = (props) =>
 
                     optionsComponents.push((
                         <MenuItem key={option.id} value={option.id}>
-                            <Checkbox checked={props.value.indexOf(option.id) > -1}/>
+                            <Checkbox checked={-1 !== props.value.indexOf(option.id)}/>
                             <ListItemText primary={option.label}/>
                         </MenuItem>
                     ));

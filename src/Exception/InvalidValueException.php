@@ -10,17 +10,15 @@ namespace PrecisionSoft\Symfony\JsonForm\Exception;
 
 class InvalidValueException extends Exception
 {
-    public function __construct(string $name, $value)
+    public function __construct(string $name, mixed $value)
     {
         parent::__construct(
             \sprintf('invalid value `%s` for `%s`', $this->serialize($value), $name),
         );
     }
 
-    private function serialize($value): string
+    protected function serialize(mixed $value): string
     {
-        /* @todo improve */
-
         switch (true) {
             case \is_scalar($value):
                 return (string)$value;

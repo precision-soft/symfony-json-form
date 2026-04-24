@@ -34,7 +34,7 @@ class TestDto implements DtoInterface
         return $this->array;
     }
 
-    public function isBool(): bool
+    public function getBool(): bool
     {
         return $this->bool;
     }

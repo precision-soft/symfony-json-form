@@ -1,5 +1,3 @@
-'use strict';
-
 import {Box} from '@mui/material';
 import {FieldArray, FormikValues} from 'formik';
 import React from 'react';
@@ -16,7 +14,7 @@ type PrototypeCollectionDefaultFieldProps = {
 
 export const PrototypeCollectionDefaultField: React.FunctionComponent<PrototypeCollectionDefaultFieldProps> = (props) => {
     return (
-        <>
+        <React.Fragment>
             {props.collectionElements.map((collectionElement) => (
                 <Box key={collectionElement.key} className="d-flex align-items-center gap-1">
                     <FormFields elements={props.elements}
@@ -25,7 +23,7 @@ export const PrototypeCollectionDefaultField: React.FunctionComponent<PrototypeC
                     />
                 </Box>
             ))}
-        </>
+        </React.Fragment>
     );
 };
 
@@ -38,19 +36,19 @@ type PrototypeCollectionFieldProps = {
     renderProps: FormFieldRenderPropsType
 }
 
-const PrototypeCollectionField: React.FunctionComponent<PrototypeCollectionFieldProps> = (props) => {
+export const PrototypeCollectionField: React.FunctionComponent<PrototypeCollectionFieldProps> = (props) => {
     const formContext = React.useContext(FormContext);
 
     const renderPrototypeCollectionComponent = (modifiers: PrototypeCollectionModifiersType) => {
         const collectionElements: PrototypeCollectionType[] = [];
-        props.value.map((v, index) => collectionElements.push({
-            key: v[props.element.key],
+        props.value.map((itemData, index) => collectionElements.push({
+            key: itemData[props.element.key],
             parents: [...props.parents, props.element.name, index]
         }));
 
         const elements = clone<ElementListType>(props.element.prototype);
 
-        if (props.renderProps?.prototypeCollectionRender) {
+        if (undefined !== props.renderProps?.prototypeCollectionRender) {
             collectionElements.map((collectionElement) => {
                 collectionElement.values = FormBuilder.getNestedValuesByPath(formContext.form.values, collectionElement.parents);
             });
@@ -95,7 +93,7 @@ const PrototypeCollectionField: React.FunctionComponent<PrototypeCollectionField
         };
 
         modifiers.get = (key) => {
-            const [_, elementValues] = findByKey(key);
+            const [unusedIndex, elementValues] = findByKey(key);
 
             return elementValues;
         };
@@ -128,4 +126,3 @@ const PrototypeCollectionField: React.FunctionComponent<PrototypeCollectionField
     );
 };
 
-export default PrototypeCollectionField;

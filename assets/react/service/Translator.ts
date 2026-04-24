@@ -1,9 +1,4 @@
-'use strict';
-
-/** external libraries */
 import * as Translator from 'bazinga-translator';
-
-/** internal components */
 import Config from '../config/Config';
 import logger from './Logger';
 

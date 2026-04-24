@@ -1,11 +1,6 @@
-'use strict';
-
 import {InputLabelProps, TextField as TextFieldBase} from '@mui/material';
 import {InputProps as StandardInputProps} from '@mui/material/Input/Input';
-/** external libraries */
 import React, {HTMLInputTypeAttribute} from 'react';
-
-/** internal components */
 import {FieldType} from './Types';
 
 type TextFieldProps = FieldType & {
@@ -21,7 +16,7 @@ export const TextField: React.FunctionComponent<TextFieldProps> = (props) => {
 
     React.useEffect(() => {
         if (inputRef.current !== null && props.autoFocus.current === true) {
-            if (props.value.length > 0 && props.selectOnFocus === true) {
+            if (0 < props.value.length && true === props.selectOnFocus) {
                 inputRef.current.select();
             } else {
                 inputRef.current.focus();

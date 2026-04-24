@@ -1,5 +1,3 @@
-'use strict';
-
 import {Box} from '@mui/material';
 import React from 'react';
 import {default as Icon, NameType} from '../component/Icon';
@@ -11,7 +9,7 @@ type IconProps = {
 
 export const CheckboxIcon: React.FunctionComponent<IconProps> = (props) => {
     const className = ['checkbox-icon d-flex align-items-center justify-content-center'];
-    if (props.className !== undefined) {
+    if (undefined !== props.className) {
         className.push(props.className);
     }
 

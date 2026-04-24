@@ -12,7 +12,6 @@ use PrecisionSoft\Symfony\JsonForm\Element\Contract\AbstractElement;
 use PrecisionSoft\Symfony\JsonForm\Exception\InvalidValueException;
 use PrecisionSoft\Symfony\JsonForm\Trait\ElementCollectionTrait;
 
-/** used for repeatable collections of elements */
 class PrototypeCollectionElement extends AbstractElement
 {
     use ElementCollectionTrait;
@@ -20,17 +19,17 @@ class PrototypeCollectionElement extends AbstractElement
     public function __construct(
         string $name,
         string $label,
-        private readonly ?string $key = null,
+        protected readonly ?string $key = null,
     ) {
         parent::__construct($name, $label);
     }
 
-    public function getType(): string
+    protected function getType(): string
     {
         return 'prototypeCollection';
     }
 
-    public function renderElement(mixed $value): array
+    protected function renderElement(mixed $value): array
     {
         if (null !== $value && false === \is_array($value)) {
             throw new InvalidValueException($this->getName(), $value);
@@ -38,8 +37,8 @@ class PrototypeCollectionElement extends AbstractElement
 
         $elements = [];
 
-        foreach (($value ?? []) as $key => $v) {
-            $elements[$key] = $this->renderElements($v);
+        foreach (($value ?? []) as $key => $itemData) {
+            $elements[$key] = $this->renderElements($itemData);
         }
 
         return [

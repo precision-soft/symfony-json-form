@@ -1,6 +1,3 @@
-'use strict';
-
-/** external libraries */
 import $ from 'jquery';
 import React from 'react';
 import AlertContext, {AlertContextType} from '../context/AlertContext';
@@ -10,8 +7,6 @@ import {NullableStringArrayType} from '../type/Array';
 import {NullableNullaryType, NullaryType} from '../type/Function';
 import {MapType, NullableMapType} from '../type/Map';
 import {NullableStringType} from '../type/Scalar';
-
-/** internal components */
 import logger from './Logger';
 
 type ResponseType = MapType & {
@@ -144,11 +139,11 @@ class HttpClient {
     getFormDataFromResponse = (response: ResponseType): FormDataType => {
         const data = this.getDataFromResponse<{ form?: FormDataType }>(response);
 
-        return data?.form ? data.form : null;
+        return null !== data?.form ? data.form : null;
     };
 
     getDataFromResponse = <T>(response: ResponseType): T => {
-        if (!response.success) {
+        if (false === response.success) {
             this.error(response.errors);
 
             return null;
@@ -170,11 +165,11 @@ class HttpClient {
                     let filename = '';
                     const disposition = xhr.getResponseHeader('Content-Disposition');
 
-                    if (disposition && disposition.indexOf('attachment') !== -1) {
+                    if (null !== disposition && -1 !== disposition.indexOf('attachment')) {
                         const filenameRegex = /filename[^;=\n]*=((["']).*?\2|[^;\n]*)/;
                         const matches = filenameRegex.exec(disposition);
 
-                        if (matches != null && matches[1]) {
+                        if (null !== matches && null !== matches[1]) {
                             filename = matches[1].replace(/["']/g, '');
                         }
                     }
@@ -185,7 +180,7 @@ class HttpClient {
                         const url = window.URL || window.webkitURL;
                         const downloadUrl = url.createObjectURL(blob);
 
-                        if (filename) {
+                        if (0 < filename.length) {
                             const a = document.createElement('a');
 
                             if (a.download === undefined) {
@@ -208,7 +203,7 @@ class HttpClient {
                         );
                     }
 
-                    httpRequest.getOnSuccess() && httpRequest.getOnSuccess()(blob);
+                    null !== httpRequest.getOnSuccess() && httpRequest.getOnSuccess()(blob);
                 }
             }
         );
@@ -236,7 +231,7 @@ class HttpClient {
         logger.info(httpRequest.getType(), httpRequest.getUrl(), data);
 
         const headers: MapType<string> = {};
-        if (this.accessToken) {
+        if (null !== this.accessToken && 0 < this.accessToken.length) {
             headers['X-AUTH-TOKEN'] = this.accessToken;
         }
 
@@ -250,10 +245,10 @@ class HttpClient {
             headers: headers,
             crossDomain: true,
             beforeSend: () => {
-                httpRequest.getBeforeSend() && httpRequest.getBeforeSend()();
+                null !== httpRequest.getBeforeSend() && httpRequest.getBeforeSend()();
             },
             success: (response) => {
-                httpRequest.getOnSuccess() && httpRequest.getOnSuccess()(response);
+                null !== httpRequest.getOnSuccess() && httpRequest.getOnSuccess()(response);
             },
             error: (jqXhr, textStatus, errorThrown) => {
                 if (textStatus === 'abort') {
@@ -269,14 +264,14 @@ class HttpClient {
                     }
                 );
 
-                const errors = jqXhr.responseJSON?.errors ? jqXhr.responseJSON?.errors : 'invalid backend response received';
+                const errors = null !== jqXhr.responseJSON?.errors ? jqXhr.responseJSON.errors : 'invalid backend response received';
 
                 this.error(errors);
 
-                httpRequest.getOnError() && httpRequest.getOnError()();
+                null !== httpRequest.getOnError() && httpRequest.getOnError()();
             },
             complete: (jqXhr) => {
-                httpRequest.getOnComplete() && httpRequest.getOnComplete()(
+                null !== httpRequest.getOnComplete() && httpRequest.getOnComplete()(
                     this.getXhrJsonResponse(jqXhr)
                 );
             }
@@ -284,7 +279,7 @@ class HttpClient {
     };
 
     private getXhrJsonResponse = (jqXhr: HttpClientRequestType): ResponseType => {
-        return jqXhr && jqXhr.responseJSON ? jqXhr?.responseJSON : null;
+        return null !== jqXhr && null !== jqXhr.responseJSON ? jqXhr.responseJSON : null;
     };
 
     private error = (errors: string | string[] | null): void => {

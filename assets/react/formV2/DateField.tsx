@@ -1,5 +1,3 @@
-'use strict';
-
 import {TextField as TextFieldBase} from '@mui/material';
 import {DesktopDatePicker, LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
@@ -27,7 +25,7 @@ export const DateField: React.FunctionComponent<DateFieldProps> = (props) => {
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DesktopDatePicker label={props.label}
                                inputFormat={FormBuilder.computeDateFormat(props.format)}
-                               value={props.value ? props.value : null}
+                               value={null !== props.value ? props.value : null}
                                onChange={props.onChange}
                                minDate={props.min}
                                maxDate={props.max}

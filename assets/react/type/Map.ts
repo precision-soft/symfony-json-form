@@ -1,5 +1,3 @@
-'use strict';
-
 import {StringNumberType} from './Scalar';
 
 export type MapType<T = unknown> = {

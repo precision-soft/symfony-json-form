@@ -1,5 +1,3 @@
-'use strict';
-
 export type NullaryType<T = void> = () => T;
 export type NullableNullaryType = NullaryType | null;
 
