@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.0.5] - 2026-04-28 - Align Symfony Phpunit Dev Dependency With Fleet
+
+### Changed
+
+- `composer.json` — `precision-soft/symfony-phpunit` constraint changed from `1.*` to `^3.0` for fleet alignment; the dependency was effectively unused (tests extend `PHPUnit\Framework\TestCase` directly), so no test code changes were required
+- `composer.lock` — regenerated; `precision-soft/symfony-phpunit` upgraded `v1.1.0` → `v3.4.3`
+
 ## [v1.0.4] - 2026-04-24 - Remove Final Modifiers And Improve Extensibility
 
 ### Changed
@@ -95,9 +102,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - React form components (formV1, formV2) with TypeScript types, autocomplete, date, datetime, select, and collection field support
 - Docker-based development environment with git hooks
 
-[Unreleased]: https://github.com/precision-soft/symfony-json-form/compare/v1.0.4...HEAD
+[Unreleased]: https://github.com/precision-soft/symfony-json-form/compare/v1.0.5...HEAD
+
+[v1.0.5]: https://github.com/precision-soft/symfony-json-form/compare/v1.0.4...v1.0.5
+
 [v1.0.4]: https://github.com/precision-soft/symfony-json-form/compare/v1.0.3...v1.0.4
+
 [v1.0.3]: https://github.com/precision-soft/symfony-json-form/compare/v1.0.2...v1.0.3
+
 [v1.0.2]: https://github.com/precision-soft/symfony-json-form/compare/v1.0.1...v1.0.2
+
 [v1.0.1]: https://github.com/precision-soft/symfony-json-form/compare/v1.0.0...v1.0.1
+
 [v1.0.0]: https://github.com/precision-soft/symfony-json-form/releases/tag/v1.0.0
