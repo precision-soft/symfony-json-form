@@ -10,6 +10,6 @@ services:
                 WORKDIR: ${CONTAINER_APP_PATH}
                 SETUP_SH_SOURCE: ${CONFIG_PATH}/setup.sh
         privileged: true
-        restart: unless-stopped
+        restart: 'no'
         volumes:
             - ${RELATIVE_PATH_TO_ROOT}:${CONTAINER_APP_PATH}
