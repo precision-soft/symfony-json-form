@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.0.7] - 2026-06-17 - Strict Date Validation And Min/Max Range Enforcement
+
+### Fixed
+
+- `DateElement::renderElement()`, `DateTimeElement::renderElement()` — value validation now round-trips through the format (`DateTime::createFromFormat('!'.$format, $value)->format($format) === $value`), so overflow dates (e.g. `2021-02-30`), trailing data and non-canonical input are rejected with `InvalidValueException`; previously `createFromFormat()` silently normalized them (e.g. `2021-02-30` → `2021-03-02`) and accepted the value
+- `PrototypeCollectionElement::renderElement()` — a non-array item inside the collection value now throws the bundle's `InvalidValueException` instead of a raw `TypeError` from the typed `renderElements(array $value)` call
+- `assets/react/formV1/Form.tsx`, `assets/react/formV2/Form.tsx` — the `BlockUi` loading className concatenated `loadingClassName` directly onto `'h-100 w-100'` without a separator and guarded it with a `null` check that never matched the optional (`undefined`) prop, producing values like `h-100 w-100undefined`; it is now assembled with an array join guarded by `undefined !==`, matching the existing `containerClassName` handling
+
+### Added
+
+- `DateElement`, `DateTimeElement` — the existing `$min`/`$max` constructor arguments are now enforced server-side as an inclusive range; an out-of-range value throws `InvalidValueException`. Bounds are parsed with the `!` format prefix so the comparison is deterministic (a value equal to `$min`/`$max` passes) and works for non-lexicographic formats such as `d-m-Y` (behavior change for consumers that previously relied on `$min`/`$max` being client-side hints only)
+- `src/Element/Trait/DateValidationTrait` — extracted `isValidDate()` / `isWithinRange()` shared by `DateElement` and `DateTimeElement`
+- `tests/Element/` — added `AutocompleteElementTest`, `CollectionElementTest`, `DateTimeElementTest`, `FileElementTest`, `HiddenElementTest`, `LabelElementTest`, `PasswordElementTest` and `PrototypeCollectionElementTest`; extended `DateElementTest` with overflow and min/max boundary/range coverage (including a `d-m-Y` range case proving non-lexicographic comparison)
+
+### Changed
+
+- `README.md` — documented the `DateElement`/`DateTimeElement` `$format`/`$min`/`$max` constructor arguments, the strict format validation, the inclusive server-side min/max enforcement, and the `CollectionElement`/`PrototypeCollectionElement` non-array guards
+
 ## [v1.0.6] - 2026-06-17 - Fix asset build and harden request-body handling
 
 ### Fixed
@@ -124,7 +142,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - React form components (formV1, formV2) with TypeScript types, autocomplete, date, datetime, select, and collection field support
 - Docker-based development environment with git hooks
 
-[Unreleased]: https://github.com/precision-soft/symfony-json-form/compare/v1.0.6...HEAD
+[Unreleased]: https://github.com/precision-soft/symfony-json-form/compare/v1.0.7...HEAD
+
+[v1.0.7]: https://github.com/precision-soft/symfony-json-form/compare/v1.0.6...v1.0.7
 
 [v1.0.6]: https://github.com/precision-soft/symfony-json-form/compare/v1.0.5...v1.0.6
 

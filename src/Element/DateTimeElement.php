@@ -8,14 +8,15 @@ declare(strict_types=1);
 
 namespace PrecisionSoft\Symfony\JsonForm\Element;
 
-use DateTime;
 use PrecisionSoft\Symfony\JsonForm\Element\Contract\AbstractElement;
+use PrecisionSoft\Symfony\JsonForm\Element\Trait\DateValidationTrait;
 use PrecisionSoft\Symfony\JsonForm\Element\Trait\ReadonlyTrait;
 use PrecisionSoft\Symfony\JsonForm\Element\Trait\RequiredTrait;
 use PrecisionSoft\Symfony\JsonForm\Exception\InvalidValueException;
 
 class DateTimeElement extends AbstractElement
 {
+    use DateValidationTrait;
     use ReadonlyTrait;
     use RequiredTrait;
 
@@ -39,7 +40,7 @@ class DateTimeElement extends AbstractElement
 
     protected function renderElement(mixed $value): array
     {
-        if (null !== $value && (false === \is_string($value) || false === DateTime::createFromFormat($this->format, $value))) {
+        if (null !== $value && false === $this->isValidDate($value)) {
             throw new InvalidValueException($this->getName(), $value);
         }
 

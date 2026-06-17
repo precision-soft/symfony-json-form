@@ -194,6 +194,11 @@ const InnerForm: React.FunctionComponent<InnerFormProps> = (props) => {
         classNames.push(props.containerClassName);
     }
 
+    const loadingClassNames = ['h-100', 'w-100'];
+    if (undefined !== props.loadingClassName) {
+        loadingClassNames.push(props.loadingClassName);
+    }
+
     return (
         <FormContextProvider form={form}
                              elements={props.elements}
@@ -202,7 +207,7 @@ const InnerForm: React.FunctionComponent<InnerFormProps> = (props) => {
         >
             <Box className={classNames.join(' ')}>
                 <BlockUi open={props.loading}
-                         className={['h-100 w-100' + (null !== props.loadingClassName ? props.loadingClassName : '')].join(' ')}
+                         className={loadingClassNames.join(' ')}
                 >
                     <FormBase name={props.name}
                               onSubmit={form.handleSubmit}

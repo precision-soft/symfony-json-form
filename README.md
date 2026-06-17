@@ -160,24 +160,31 @@ class ProductController extends AbstractController
 Each element renders to a json node with a `type` the frontend dispatches on. All take `name` and `label` first;
 the most relevant extra constructor arguments are noted below.
 
-| Element | json `type` | Extra arguments |
-| --- | --- | --- |
-| `StringElement` | `string` | — |
-| `NumberElement` | `number` | `?float $min`, `?float $max`, `?float $step` |
-| `BoolElement` | `bool` | — |
-| `DateElement` | `date` | — |
-| `DateTimeElement` | `dateTime` | — |
-| `PasswordElement` | `password` | — |
-| `HiddenElement` | `hidden` | (label is not required) |
-| `LabelElement` | `label` | display-only |
-| `FileElement` | `file` | — |
-| `ArrayElement` | `array` | `array $options`, `string $mode` (`MODE_SINGLE`/`MODE_MULTIPLE`) |
-| `AutocompleteElement` | `autocomplete` | `string $route`, `string $mode`, `string $parameter = 'query'` |
-| `CollectionElement` | `collection` | nested elements via `addElement()` |
-| `PrototypeCollectionElement` | `prototypeCollection` | nested elements via `addElement()` (repeatable) |
+| Element                      | json `type`           | Extra arguments                                                  |
+|------------------------------|-----------------------|------------------------------------------------------------------|
+| `StringElement`              | `string`              | —                                                                |
+| `NumberElement`              | `number`              | `?float $min`, `?float $max`, `?float $step`                     |
+| `BoolElement`                | `bool`                | —                                                                |
+| `DateElement`                | `date`                | `string $format = 'Y-m-d'`, `?string $min`, `?string $max`       |
+| `DateTimeElement`            | `dateTime`            | `string $format = 'Y-m-d H:i'`, `?string $min`, `?string $max`   |
+| `PasswordElement`            | `password`            | —                                                                |
+| `HiddenElement`              | `hidden`              | (label is not required)                                          |
+| `LabelElement`               | `label`               | display-only                                                     |
+| `FileElement`                | `file`                | —                                                                |
+| `ArrayElement`               | `array`               | `array $options`, `string $mode` (`MODE_SINGLE`/`MODE_MULTIPLE`) |
+| `AutocompleteElement`        | `autocomplete`        | `string $route`, `string $mode`, `string $parameter = 'query'`   |
+| `CollectionElement`          | `collection`          | nested elements via `addElement()`                               |
+| `PrototypeCollectionElement` | `prototypeCollection` | nested elements via `addElement()` (repeatable)                  |
 
 `ArrayElement` and `AutocompleteElement` throw `InvalidModeException` for an unknown `$mode`. Element names must be
 alphanumeric (`ctype_alnum`) — this is enforced and intentional.
+
+`DateElement` and `DateTimeElement` validate the value strictly against `$format`: a value that does not round-trip
+through the format (e.g. an overflow date such as `2021-02-30`) throws `InvalidValueException`. When `$min` and/or
+`$max` are set, the value is also enforced server-side to fall within that inclusive range — an out-of-range value
+throws `InvalidValueException`. `CollectionElement`
+and `PrototypeCollectionElement` throw `InvalidValueException` when the value — or, for the prototype collection, any
+item — is not an array.
 
 ## Request handling and sanitization
 

@@ -86,4 +86,67 @@ final class DateElementTest extends TestCase
 
         $dateElement->render('not-a-date');
     }
+
+    public function testRenderWithOverflowDateThrowsException(): void
+    {
+        $dateElement = new DateElement('birthday', 'label');
+
+        static::expectException(InvalidValueException::class);
+
+        $dateElement->render('2021-02-30');
+    }
+
+    public function testRenderBelowMinThrowsException(): void
+    {
+        $dateElement = new DateElement('birthday', 'label', DateElement::FORMAT_Y_M_D, '2020-01-01', '2030-12-31');
+
+        static::expectException(InvalidValueException::class);
+
+        $dateElement->render('2019-12-31');
+    }
+
+    public function testRenderAboveMaxThrowsException(): void
+    {
+        $dateElement = new DateElement('birthday', 'label', DateElement::FORMAT_Y_M_D, '2020-01-01', '2030-12-31');
+
+        static::expectException(InvalidValueException::class);
+
+        $dateElement->render('2031-01-01');
+    }
+
+    public function testRenderAtMinBoundaryPasses(): void
+    {
+        $dateElement = new DateElement('birthday', 'label', DateElement::FORMAT_Y_M_D, '2020-01-01', '2030-12-31');
+
+        $result = $dateElement->render('2020-01-01');
+
+        static::assertSame('2020-01-01', $result['value']);
+    }
+
+    public function testRenderAtMaxBoundaryPasses(): void
+    {
+        $dateElement = new DateElement('birthday', 'label', DateElement::FORMAT_Y_M_D, '2020-01-01', '2030-12-31');
+
+        $result = $dateElement->render('2030-12-31');
+
+        static::assertSame('2030-12-31', $result['value']);
+    }
+
+    public function testRenderWithinDMYRangePasses(): void
+    {
+        $dateElement = new DateElement('birthday', 'label', DateElement::FORMAT_D_M_Y, '01-01-2020', '31-12-2020');
+
+        $result = $dateElement->render('15-06-2020');
+
+        static::assertSame('15-06-2020', $result['value']);
+    }
+
+    public function testRenderOutsideDMYRangeThrowsException(): void
+    {
+        $dateElement = new DateElement('birthday', 'label', DateElement::FORMAT_D_M_Y, '01-01-2020', '31-12-2020');
+
+        static::expectException(InvalidValueException::class);
+
+        $dateElement->render('15-06-2021');
+    }
 }

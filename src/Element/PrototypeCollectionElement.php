@@ -38,6 +38,10 @@ class PrototypeCollectionElement extends AbstractElement
         $elements = [];
 
         foreach (($value ?? []) as $key => $itemData) {
+            if (false === \is_array($itemData)) {
+                throw new InvalidValueException($this->getName(), $itemData);
+            }
+
             $elements[$key] = $this->renderElements($itemData);
         }
 
