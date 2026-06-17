@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace PrecisionSoft\Symfony\JsonForm\Test\Form;
 
 use PHPUnit\Framework\TestCase;
+use PrecisionSoft\Symfony\JsonForm\Exception\Exception;
 use PrecisionSoft\Symfony\JsonForm\Test\Utility\TestDto;
 use PrecisionSoft\Symfony\JsonForm\Test\Utility\TestForm;
 use Symfony\Component\HttpFoundation\Request;
@@ -45,6 +46,65 @@ final class FormTest extends TestCase
         $dto = $testForm->handleRequest($request);
 
         static::assertInstanceOf(TestDto::class, $dto);
+    }
+
+    public function testHandleThrowsExceptionForScalarRequestBody(): void
+    {
+        $postForm = new class extends TestForm {
+            protected function getMethod(): string
+            {
+                return Request::METHOD_POST;
+            }
+        };
+        $postForm->setSerializer($this->getSerializer());
+
+        $request = new Request(content: '5');
+
+        static::expectException(Exception::class);
+        static::expectExceptionMessageMatches('/must decode to an array/');
+
+        $postForm->handleRequest($request);
+    }
+
+    public function testHandleThrowsExceptionForMalformedJsonBody(): void
+    {
+        $postForm = new class extends TestForm {
+            protected function getMethod(): string
+            {
+                return Request::METHOD_POST;
+            }
+        };
+        $postForm->setSerializer($this->getSerializer());
+
+        $request = new Request(content: '{"invalid": ');
+
+        static::expectException(Exception::class);
+        static::expectExceptionMessageMatches('/is not valid JSON/');
+
+        $postForm->handleRequest($request);
+    }
+
+    public function testSanitizeDataKeepsEmptyStringsButDropsEmptyArrays(): void
+    {
+        $form = new class extends TestForm {
+            public function exposeSanitizeData(array $data): array
+            {
+                return $this->sanitizeData($data);
+            }
+        };
+
+        $sanitizedData = $form->exposeSanitizeData([
+            'string' => '',
+            'kept' => 'value',
+            'emptyArray' => [],
+            'nested' => ['inner' => ''],
+        ]);
+
+        /** @info an explicit empty string must survive so a `PATCH`/`PUT` can clear a field */
+        static::assertSame('', $sanitizedData['string']);
+        static::assertSame('value', $sanitizedData['kept']);
+        static::assertArrayNotHasKey('emptyArray', $sanitizedData);
+        static::assertSame(['inner' => ''], $sanitizedData['nested']);
     }
 
     private function getSerializer(): Serializer

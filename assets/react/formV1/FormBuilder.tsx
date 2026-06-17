@@ -1,7 +1,7 @@
 import {Box} from '@mui/material';
 import {FastField, FormikValues} from 'formik';
 import React from 'react';
-import {clone} from '../service/Uility';
+import {clone} from '../service/Utility';
 import {StringArrayType} from '../type/Array';
 import {MapType} from '../type/Map';
 import {StringNumberType} from '../type/Scalar';

@@ -1,0 +1,9 @@
+{
+    "name": "precision-soft-symfony-json-form",
+    "description": "Dev-only tests for the framework-agnostic React asset services; run with Node's built-in test runner (no dependencies). The host application is responsible for bundling these sources.",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "test": "node --test"
+    }
+}

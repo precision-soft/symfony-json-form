@@ -74,6 +74,20 @@ php_unit() {
     print_command "end php unit"
 }
 
+js_test() {
+    print_command "start js test"
+    println ""
+
+    run_in_container_dev sh -c 'cd assets/react && node --test'
+
+    if [[ $? != 0 ]]; then
+        print_error "fix the errors before commit"
+        stop 1
+    fi
+
+    print_command "end js test"
+}
+
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMR)
@@ -105,6 +119,13 @@ if [[ "${STAGED_FILES_PHP}" != "" ]]; then
     println ""
 
     php_unit
+fi
+
+STAGED_FILES_JS=$(git diff --cached --name-only --diff-filter=ACMR HEAD | grep -E '\.tsx?$')
+if [[ "${STAGED_FILES_JS}" != "" ]]; then
+    println ""
+
+    js_test
 fi
 
 println ""

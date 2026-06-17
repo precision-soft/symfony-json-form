@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.0.6] - 2026-06-17 - Fix asset build and harden request-body handling
+
+### Fixed
+
+- `assets/react/service/Utility.ts` — added the missing `clone()` helper (deep clone via `structuredClone` with a `JSON` round-trip fallback); `formV1/FormBuilder` and `formV2/PrototypeCollectionField` imported `clone` from a non-existent `../service/Uility` module, which broke the bundle build
+- `formV1/FormBuilder`, `formV2/PrototypeCollectionField` — corrected the `clone` import path from the misspelled `../service/Uility` to `../service/Utility`
+- `AbstractFormService::getDataAndContext()` — a request body that decodes to a non-array scalar (e.g. `5`) now throws a clear `Exception` instead of a raw `TypeError` from the array-offset access
+- `AbstractFormService::getDataAndContext()` — a malformed JSON request body now throws the bundle's own `Exception` ("request body for form `…` is not valid JSON", original kept as `previous`) instead of letting Symfony's `NotEncodableValueException` escape, matching how the rest of the bundle reports input problems
+
+### Changed
+
+- `AbstractFormService::sanitizeData()` — empty strings are no longer dropped, so a `PATCH`/`PUT` can explicitly clear a field by sending `""`; empty arrays are still dropped so an absent nested structure does not override DTO defaults (behavior change)
+- `README.md` — expanded with form-element reference, request/sanitization behavior, V1-vs-V2 guidance and a Tests section; corrected the form-service example (added the required `getMethod()`, fixed the `getAction()`/`build()` signatures to take `DtoInterface $dto`)
+
+### Added
+
+- `FormTest::testHandleThrowsExceptionForScalarRequestBody` covering the scalar-body guard
+- `FormTest::testSanitizeDataKeepsEmptyStringsButDropsEmptyArrays` covering the sanitize behavior
+- `FormTest::testHandleThrowsExceptionForMalformedJsonBody` covering the malformed-JSON guard
+- `assets/react/` — dependency-free test harness for the framework-agnostic asset services using Node's built-in test runner (`npm test` → `node --test`), with `service/Utility.test.ts` covering `clone()`; the dev container now ships Node, and the pre-commit hook runs `node --test` when `.ts/.tsx` files are staged
+- `composer.json` — added `test`, `cs-check`, `cs-fix` and an aggregate `check` convenience script wrapping `simple-phpunit` and `php-cs-fixer`
+
 ## [v1.0.5] - 2026-04-28 - Align Symfony Phpunit Dev Dependency With Fleet
 
 ### Changed
@@ -102,7 +124,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - React form components (formV1, formV2) with TypeScript types, autocomplete, date, datetime, select, and collection field support
 - Docker-based development environment with git hooks
 
-[Unreleased]: https://github.com/precision-soft/symfony-json-form/compare/v1.0.5...HEAD
+[Unreleased]: https://github.com/precision-soft/symfony-json-form/compare/v1.0.6...HEAD
+
+[v1.0.6]: https://github.com/precision-soft/symfony-json-form/compare/v1.0.5...v1.0.6
 
 [v1.0.5]: https://github.com/precision-soft/symfony-json-form/compare/v1.0.4...v1.0.5
 

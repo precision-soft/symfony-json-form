@@ -18,6 +18,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
+use Throwable;
 
 abstract class AbstractFormService
 {
@@ -95,7 +96,15 @@ abstract class AbstractFormService
             case Request::METHOD_PATCH:
                 $requestContent = $request->getContent();
                 if (false === empty($requestContent)) {
-                    $data = (new JsonEncoder())->decode($requestContent, JsonEncoder::FORMAT);
+                    try {
+                        $data = (new JsonEncoder())->decode($requestContent, JsonEncoder::FORMAT);
+                    } catch (Throwable $throwable) {
+                        throw new Exception(
+                            \sprintf('request body for form `%s` is not valid JSON', $this->getName()),
+                            0,
+                            $throwable,
+                        );
+                    }
                 } else {
                     $data = $request->request->all();
                     $context[AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT] = true;
@@ -105,6 +114,12 @@ abstract class AbstractFormService
                 throw new Exception(
                     \sprintf('can not handle `%s` request method', $request->getMethod()),
                 );
+        }
+
+        if (false === \is_array($data)) {
+            throw new Exception(
+                \sprintf('request body for form `%s` must decode to an array', $this->getName()),
+            );
         }
 
         return [$data[$this->getName()] ?? [], $context];
@@ -124,19 +139,13 @@ abstract class AbstractFormService
         $sanitizedData = [];
 
         foreach ($data as $key => $value) {
-            switch (true) {
-                case \is_array($value):
-                    $value = $this->sanitizeData($value);
+            /** @info empty arrays are dropped so an absent nested structure does not override DTO defaults; empty strings are kept so a `PATCH`/`PUT` can explicitly clear a field to `''` */
+            if (true === \is_array($value)) {
+                $value = $this->sanitizeData($value);
 
-                    if (true === empty($value)) {
-                        continue 2;
-                    }
-                    break;
-                case \is_string($value):
-                    if ('' === $value) {
-                        continue 2;
-                    }
-                    break;
+                if (true === empty($value)) {
+                    continue;
+                }
             }
 
             $sanitizedData[$key] = $value;

@@ -8,14 +8,26 @@ Any suggestions are welcomed.
 
 The purpose of this library is to create forms for single page applications, with a symfony backend.
 The forms are constructed in the backend and serialized to json, that can be rendered in the frontend. In the assets folder you can find a react component to render the form.
-There are 2 versions of the form:
 
-* [formV1](./assets/react/formV1), is the original react components for rendering the form, kept for backwards compatibility.
-* [formV2](./assets/react/formV2), the new components and the recommended way to render the json.
+A form is described by three pieces that you provide per form:
+
+* a **DTO** (`DtoInterface`) — the typed data structure the form maps to and from;
+* a **form service** (`AbstractFormService`) — declares the HTTP method, the submit action, and the elements;
+* the **elements** — the individual fields (`NumberElement`, `StringElement`, ...).
+
+`render()` serializes the form (plus the DTO values) to a json structure for the frontend; `handleRequest()` takes the
+incoming request, sanitizes it, and denormalizes it back into the DTO.
+
+### V1 vs V2
+
+There are 2 versions of the react renderer. They consume the **same** backend json — only the frontend components differ:
+
+* [formV1](./assets/react/formV1) — the original react components, kept for backwards compatibility.
+* [formV2](./assets/react/formV2) — the new components and the **recommended** way to render the json.
 
 ## Usage
 
-Add this to your **services.yaml**.
+Add this to your **services.yaml** so every form service receives the serializer:
 
 ```yaml
 services:
@@ -25,44 +37,46 @@ services:
                 - [ setSerializer, [ '@serializer' ] ]
 ```
 
+A form service must implement four abstract methods: `getDtoClass()`, `getMethod()`, `getAction(DtoInterface $dto)`
+and `build(Form $form, DtoInterface $dto)`.
+
 ```php
 <?php
 
 declare(strict_types=1);
 
-/*
- * Copyright (c) Vivre
- */
+namespace Acme\Form;
 
-namespace Acme\Controller;
-
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Acme\Dto\ProductEditDto;
-use Acme\Form\ProductEditForm;
-use Acme\Service\ProductEditService;
+use PrecisionSoft\Symfony\JsonForm\Contract\DtoInterface;
+use PrecisionSoft\Symfony\JsonForm\Element\ArrayElement;
+use PrecisionSoft\Symfony\JsonForm\Element\NumberElement;
+use PrecisionSoft\Symfony\JsonForm\Form\Action;
+use PrecisionSoft\Symfony\JsonForm\Form\Form;
+use PrecisionSoft\Symfony\JsonForm\Service\Contract\AbstractFormService;
+use Symfony\Component\HttpFoundation\Request;
 
-class ProductController extends AbstractController
+class ProductEditForm extends AbstractFormService
 {
-    public function edit(Request $request, ProductEditForm $productEditForm, ProductEditService $productEditService): Response
+    protected function getDtoClass(): string
     {
-        $id = $request->get('id');
+        return ProductEditDto::class;
+    }
 
-        if (Request::METHOD_POST === $request->getMethod()) {
-            /** @var ProductEditDto $dto */
-            $dto = $productEditForm->handleRequest($request);
+    protected function getMethod(): string
+    {
+        return Request::METHOD_POST;
+    }
 
-            $productEditService->save($dto);
-        } else {
-            $dto = $productEditService->createDto($id);
-        }
+    protected function getAction(DtoInterface $dto): Action
+    {
+        return new Action('product-edit', ['id' => $dto instanceof ProductEditDto ? $dto->getId() : null]);
+    }
 
-        return $this->json(
-            [
-                'form' => $productEditForm->render($dto),
-            ]
-        );
+    protected function build(Form $form, DtoInterface $dto): void
+    {
+        $form->addElement(new NumberElement('id', 'Id'))
+            ->addElement(new ArrayElement('status', 'Status', ['active' => 'Active', 'inactive' => 'Inactive']));
     }
 }
 ```
@@ -71,10 +85,6 @@ class ProductController extends AbstractController
 <?php
 
 declare(strict_types=1);
-
-/*
- * Copyright (c) Vivre
- */
 
 namespace Acme\Dto;
 
@@ -116,79 +126,98 @@ class ProductEditDto implements DtoInterface
 
 declare(strict_types=1);
 
-/*
- * Copyright (c) Vivre
- */
-
-namespace Acme\Form;
+namespace Acme\Controller;
 
 use Acme\Dto\ProductEditDto;
-use PrecisionSoft\Symfony\JsonForm\Element\ArrayElement;
-use PrecisionSoft\Symfony\JsonForm\Element\NumberElement;
-use PrecisionSoft\Symfony\JsonForm\Form\Action;
-use PrecisionSoft\Symfony\JsonForm\Form\Form;
-use PrecisionSoft\Symfony\JsonForm\Service\Contract\AbstractFormService;
+use Acme\Form\ProductEditForm;
+use Acme\Service\ProductEditService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-class ProductEditForm extends AbstractFormService
+class ProductController extends AbstractController
 {
-    protected function getDtoClass(): string
+    public function edit(Request $request, ProductEditForm $productEditForm, ProductEditService $productEditService): Response
     {
-        return ProductEditDto::class;
-    }
+        $id = (int)$request->get('id');
 
-    protected function getAction(): Action
-    {
-        return new Action('product-edit');
-    }
+        if (Request::METHOD_POST === $request->getMethod()) {
+            /** @var ProductEditDto $dto */
+            $dto = $productEditForm->handleRequest($request);
 
-    protected function build(Form $form): void
-    {
-        $form->addElement(new NumberElement('id', 'Id'))
-            ->addElement(new ArrayElement('status', 'Status', ['active' => 'Active', 'inactive' => 'Inactive']));
+            $productEditService->save($dto);
+        } else {
+            $dto = $productEditService->createDto($id);
+        }
+
+        return $this->json(['form' => $productEditForm->render($dto)]);
     }
 }
 ```
 
-```php
-<?php
+## Form elements
 
-declare(strict_types=1);
+Each element renders to a json node with a `type` the frontend dispatches on. All take `name` and `label` first;
+the most relevant extra constructor arguments are noted below.
 
-/*
- * Copyright (c) Vivre
- */
+| Element | json `type` | Extra arguments |
+| --- | --- | --- |
+| `StringElement` | `string` | — |
+| `NumberElement` | `number` | `?float $min`, `?float $max`, `?float $step` |
+| `BoolElement` | `bool` | — |
+| `DateElement` | `date` | — |
+| `DateTimeElement` | `dateTime` | — |
+| `PasswordElement` | `password` | — |
+| `HiddenElement` | `hidden` | (label is not required) |
+| `LabelElement` | `label` | display-only |
+| `FileElement` | `file` | — |
+| `ArrayElement` | `array` | `array $options`, `string $mode` (`MODE_SINGLE`/`MODE_MULTIPLE`) |
+| `AutocompleteElement` | `autocomplete` | `string $route`, `string $mode`, `string $parameter = 'query'` |
+| `CollectionElement` | `collection` | nested elements via `addElement()` |
+| `PrototypeCollectionElement` | `prototypeCollection` | nested elements via `addElement()` (repeatable) |
 
-namespace Acme\Service;
+`ArrayElement` and `AutocompleteElement` throw `InvalidModeException` for an unknown `$mode`. Element names must be
+alphanumeric (`ctype_alnum`) — this is enforced and intentional.
 
-use Acme\Dto\ProductEditDto;
+## Request handling and sanitization
 
-class ProductEditService
-{
-    public function createDto(int $id): ProductEditDto
-    {
-        $dto = new ProductEditDto();
+`handleRequest(Request $request, ?DtoInterface $dto = null, bool $sanitizeData = true)`:
 
-        $dto->setId($id);
+* For `GET` the data is read from the query string; for `POST`/`PUT`/`PATCH` from the json body (falling back to
+  `request->all()` when the body is empty).
+* A request body that decodes to a non-array scalar (e.g. `5`) throws an `Exception` rather than a raw `TypeError`.
+* Pass an existing `$dto` to populate it in place (`OBJECT_TO_POPULATE`) — useful for `PATCH`/`PUT`.
 
-        /* @todo populate all the data from the db */
+When `$sanitizeData` is `true` (default), `sanitizeData()` applies the following rules before denormalization:
 
-        return $dto;
-    }
+* **empty arrays are dropped** — an absent nested structure does not override DTO defaults;
+* **empty strings are kept** — so a `PATCH`/`PUT` can explicitly clear a field by sending `""`.
 
-    public function save(ProductEditDto $dto): void
-    {
-    }
-}
-```
+Pass `sanitizeData: false` to denormalize the raw payload unchanged.
 
-### React
+## React
 
-Use the components from **./assets/react** folder to interpret the backend response.
-The **Config** component is project specific. For me, it holds the locale context of the application.
-It is integrated with:
+Use the components from **./assets/react** to interpret the backend response. This package ships the **sources** only;
+the host application is responsible for bundling them (there is no build step here).
+The **Config** component is project specific — it holds the locale context of the application. It is integrated with:
 
 * `willdurand/js-translation-bundle` for the Translator.
 * `friendsofsymfony/jsrouting-bundle` for the UrlGenerator.
+
+## Tests
+
+PHP tests run in the dev container:
+
+```shell
+./dc exec dev php vendor/bin/simple-phpunit
+```
+
+The framework-agnostic react asset services (e.g. `service/Utility.ts`) are covered by a dependency-free harness using
+Node's built-in test runner (the dev container ships Node):
+
+```shell
+./dc exec dev sh -c 'cd assets/react && npm test'
+```
 
 ## Dev
 
@@ -201,5 +230,4 @@ cd json-form
 
 ## Todo
 
-* Render and handle complex types like \DateTime.
-* Unit tests.
+* Render and handle complex types like `\DateTime` in DTO denormalization.
