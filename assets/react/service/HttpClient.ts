@@ -16,7 +16,8 @@ type ResponseType = MapType & {
 }
 
 export type OnSuccessType<T> = (response: T) => void;
-export type OnCompleteType<T> = (response: T) => void;
+/** the response is null when the request failed before a json body was received. */
+export type OnCompleteType<T> = (response: T | null) => void;
 
 export enum HttpRequestTypeEnum {
     GET = 'get',
@@ -34,10 +35,10 @@ export class HttpRequest<RT = ResponseType> {
     private data: MapType = {};
 
     private beforeSend: NullableNullaryType = null;
-    private onComplete: OnCompleteType<MapType> = null;
+    private onComplete: OnCompleteType<MapType> | null = null;
     private onError: NullableNullaryType = null;
 
-    private httpClientRequest: HttpClientRequestType = null;
+    private httpClientRequest: HttpClientRequestType | null = null;
 
     constructor(url: string, onSuccess: OnSuccessType<RT>, type: HttpRequestTypeEnum) {
         this.url = url;
@@ -77,7 +78,7 @@ export class HttpRequest<RT = ResponseType> {
         return this;
     };
 
-    getOnComplete = (): OnCompleteType<MapType> => {
+    getOnComplete = (): OnCompleteType<MapType> | null => {
         return this.onComplete;
     };
 
@@ -136,13 +137,13 @@ class HttpClient {
         this.alertContext = alertContext;
     }
 
-    getFormDataFromResponse = (response: ResponseType): FormDataType => {
+    getFormDataFromResponse = (response: ResponseType): FormDataType | null => {
         const data = this.getDataFromResponse<{ form?: FormDataType }>(response);
 
-        return null !== data?.form ? data.form : null;
+        return data?.form ?? null;
     };
 
-    getDataFromResponse = <T>(response: ResponseType): T => {
+    getDataFromResponse = <T>(response: ResponseType): T | null => {
         if (false === response.success) {
             this.error(response.errors);
 
@@ -245,7 +246,9 @@ class HttpClient {
             headers: headers,
             crossDomain: true,
             beforeSend: () => {
-                null !== httpRequest.getBeforeSend() && httpRequest.getBeforeSend()();
+                const beforeSend = httpRequest.getBeforeSend();
+
+                null !== beforeSend && beforeSend();
             },
             success: (response) => {
                 null !== httpRequest.getOnSuccess() && httpRequest.getOnSuccess()(response);
@@ -264,22 +267,28 @@ class HttpClient {
                     }
                 );
 
-                const errors = null !== jqXhr.responseJSON?.errors ? jqXhr.responseJSON.errors : 'invalid backend response received';
+                /** `responseJSON` is absent - not null - when the body is not json, which is exactly when the fallback is wanted. */
+                const errors = jqXhr.responseJSON?.errors ?? 'invalid backend response received';
 
                 this.error(errors);
 
-                null !== httpRequest.getOnError() && httpRequest.getOnError()();
+                const onError = httpRequest.getOnError();
+
+                null !== onError && onError();
             },
             complete: (jqXhr) => {
-                null !== httpRequest.getOnComplete() && httpRequest.getOnComplete()(
+                const onComplete = httpRequest.getOnComplete();
+
+                null !== onComplete && onComplete(
                     this.getXhrJsonResponse(jqXhr)
                 );
             }
         };
     };
 
-    private getXhrJsonResponse = (jqXhr: HttpClientRequestType): ResponseType => {
-        return null !== jqXhr && null !== jqXhr.responseJSON ? jqXhr.responseJSON : null;
+    /** jquery only sets `responseJSON` when the body actually parsed as json, so an error page yields null. */
+    private getXhrJsonResponse = (jqXhr: HttpClientRequestType): ResponseType | null => {
+        return (jqXhr?.responseJSON as ResponseType) ?? null;
     };
 
     private error = (errors: string | string[] | null): void => {
@@ -289,17 +298,21 @@ class HttpClient {
 
         logger.error(errors);
 
-        if (this.alertContext === null || this.alertContext.addError === undefined) {
+        const alertContext = this.alertContext;
+
+        if (alertContext === null || alertContext.addError === undefined) {
             return;
         }
+
+        const addError = alertContext.addError;
 
         if (Array.isArray(errors)) {
-            errors.map((error: string) => this.alertContext.addError(error));
+            errors.map((error: string) => addError(error));
 
             return;
         }
 
-        this.alertContext.addError(errors as string);
+        addError(errors as string);
     };
 }
 

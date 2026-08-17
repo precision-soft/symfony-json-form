@@ -27,6 +27,11 @@ trait ElementCollectionTrait
         return $this;
     }
 
+    /**
+     * @param array<string, mixed> $value
+     *
+     * @return array<string, array<string, mixed>>
+     */
     protected function renderElements(array $value): array
     {
         $elements = [];

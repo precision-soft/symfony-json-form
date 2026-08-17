@@ -45,6 +45,7 @@ class AutocompleteElement extends AbstractElement
         return 'autocomplete';
     }
 
+    /** @return array<string, mixed> */
     protected function renderElement(mixed $value): array
     {
         if (null !== $value) {

@@ -23,7 +23,7 @@ class InvalidValueException extends Exception
             case \is_scalar($value):
                 return (string)$value;
             case \is_array($value):
-                return \implode(', ', $value);
+                return \implode(', ', \array_map(fn(mixed $item): string => $this->serialize($item), $value));
             case \is_object($value):
                 return $value::class;
         }

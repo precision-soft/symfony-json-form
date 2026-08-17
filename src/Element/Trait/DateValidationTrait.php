@@ -9,9 +9,26 @@ declare(strict_types=1);
 namespace PrecisionSoft\Symfony\JsonForm\Element\Trait;
 
 use DateTime;
+use PrecisionSoft\Symfony\JsonForm\Exception\InvalidValueException;
 
 trait DateValidationTrait
 {
+    protected function validateBounds(): void
+    {
+        foreach (['min' => $this->min, 'max' => $this->max] as $bound => $value) {
+            if (null === $value) {
+                continue;
+            }
+
+            if (false === DateTime::createFromFormat('!' . $this->format, $value)) {
+                throw new InvalidValueException(
+                    \sprintf('%s of `%s`', $bound, $this->getName()),
+                    $value,
+                );
+            }
+        }
+    }
+
     protected function isValidDate(mixed $value): bool
     {
         if (false === \is_string($value)) {

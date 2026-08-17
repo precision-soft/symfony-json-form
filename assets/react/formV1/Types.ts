@@ -3,11 +3,11 @@ import {SelectChangeEvent} from '@mui/material/Select/SelectInput';
 import {FormikProps, FormikValues} from 'formik';
 import React from 'react';
 import {HttpRequestTypeEnum} from '../service/HttpClient';
-import {StringArrayType} from '../type/Array';
+import {NullableStringArrayType, StringArrayType} from '../type/Array';
 import {NullaryType} from '../type/Function';
 import {MapType, NullableMapType} from '../type/Map';
 import {BooleanRefType} from '../type/React';
-import {StringNumberType} from '../type/Scalar';
+import {NullableStringType, StringNumberType} from '../type/Scalar';
 
 export enum ElementTypeEnum {
     ARRAY = 'array',
@@ -39,7 +39,8 @@ export type FormFieldValueType = any;
 export type ElementType = {
     type: ElementTypeEnum
     name: string
-    label: string
+    /** nullable: `AbstractElement` takes `?string $label` and renders it as it is. */
+    label: NullableStringType
     readonly?: boolean
     required?: boolean
     format?: string
@@ -77,7 +78,7 @@ export type FormFieldRenderPropsType = FocusType & {
     onChange?: (event: OnChangeEventType, value: OnChangeValueType) => void
     className?: string
     elements?: FormFieldsRenderPropsType
-    prototypeCollectionRender?: (collectionElements: PrototypeCollectionType[], prototype: ElementListType, form: FormType, renderProps: FormFieldRenderPropsType, callbacks: FormFieldCallbacksType) => React.ReactElement
+    prototypeCollectionRender?: (collectionElements: PrototypeCollectionType[], prototype: ElementListType, form: FormType, renderProps: FormFieldRenderPropsType, callbacks: FormFieldCallbacksType | undefined) => React.ReactElement
 }
 export type FormFieldsRenderPropsType = {
     [name: string]: FormFieldRenderPropsType
@@ -89,7 +90,7 @@ export type FormRenderPropsType = {
 
 export type FormFieldCallbacksType = {
     remove?: (key: StringNumberType) => void
-    get?: <RT = unknown>(key: StringNumberType) => MapType<RT>
+    get?: <RT = unknown>(key: StringNumberType) => MapType<RT> | null
     set?: (key: StringNumberType, values: MapType) => void
     elements?: FormFieldsCallbacksType
 }
@@ -110,12 +111,12 @@ export type FormDataType = MapType & {
     elements: ElementListType
 }
 
-export type OnSubmitSuccessType<VT = MapType, DT = MapType> = (values: VT, data: DT) => void;
-export type OnSubmitFailureType = (errors?: StringArrayType) => void;
+export type OnSubmitSuccessType<VT = MapType, DT = MapType> = (values: VT, data: DT | null) => void;
+export type OnSubmitFailureType = (errors: NullableStringArrayType) => void;
 
 export type FieldType = FocusType & {
     name: string
-    label: string
+    label: NullableStringType
     required: boolean
     readonly: boolean
     value: any

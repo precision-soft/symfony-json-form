@@ -164,7 +164,7 @@ export const Form: React.FunctionComponent<FormProps> = (props) => {
 
                 undefined !== props.beforeSend && props.beforeSend();
             })
-            .setOnError(() => undefined !== props.onSubmitFailure && props.onSubmitFailure())
+            .setOnError(() => undefined !== props.onSubmitFailure && props.onSubmitFailure(null))
             .setOnComplete(() => {
                 undefined !== props.onComplete && props.onComplete();
 

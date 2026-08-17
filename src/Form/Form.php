@@ -20,6 +20,11 @@ class Form
         protected readonly Action $action,
     ) {}
 
+    /**
+     * @param array<string, mixed> $data
+     *
+     * @return array<string, mixed>
+     */
     public function render(array $data): array
     {
         return [

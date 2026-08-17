@@ -3,6 +3,7 @@ import {FastField, FieldArray, FormikValues} from 'formik';
 import React from 'react';
 import LanguageContext from '../context/LanguageContext';
 import Exception from '../exception/Exception';
+import {requireElementProperty} from '../service/Element';
 import {StringArrayType} from '../type/Array';
 import {BooleanRefType} from '../type/React';
 import {NullableNumberType, NullableStringType} from '../type/Scalar';
@@ -28,7 +29,7 @@ export const FormField: React.FunctionComponent<FormFieldProps> = (props) => {
     const languageContext = React.useContext(LanguageContext);
     const defaultAutoFocus = React.useRef<boolean>(false);
 
-    const buildName = (element: ElementType, parents: StringArrayType): string => {
+    const buildName = (element: ElementType, parents?: StringArrayType): string => {
         const prefix = undefined === parents ? [] : parents;
 
         return [...prefix, element.name].join('.');
@@ -40,13 +41,14 @@ export const FormField: React.FunctionComponent<FormFieldProps> = (props) => {
     }
 
     const name: string = buildName(props.element, props.parents);
+    const parents: StringArrayType = undefined === props.parents ? [] : props.parents;
     const label: NullableStringType = null !== props.element.label ? languageContext.translate(props.element.label) : null;
     const readonly: boolean = (undefined !== props.element.readonly ? props.element.readonly : false) || props.form.isSubmitting;
     const required: boolean = undefined !== props.element.required ? props.element.required : false;
     const autoFocus: BooleanRefType = undefined !== props.renderProps?.autoFocus ? props.renderProps.autoFocus : defaultAutoFocus;
     const selectOnFocus: boolean = undefined !== props.renderProps?.selectOnFocus ? props.renderProps.selectOnFocus : false;
     const onChange: OnChangeCallbackType = (event, value) => {
-        let processedValue = undefined;
+        let processedValue: FormFieldValueType = undefined;
 
         switch (props.element.type) {
             case ElementTypeEnum.ARRAY:
@@ -70,12 +72,12 @@ export const FormField: React.FunctionComponent<FormFieldProps> = (props) => {
                 }
                 break;
             case ElementTypeEnum.DATE:
-                const dateFormat = FormBuilder.computeDateFormat(props.element.format);
+                const dateFormat = FormBuilder.computeDateFormat(requireElementProperty(props.element, 'format'));
 
                 processedValue = event?.format(dateFormat);
                 break;
             case ElementTypeEnum.DATE_TIME:
-                const dateTimeFormat = FormBuilder.computeDateTimeFormat(props.element.format);
+                const dateTimeFormat = FormBuilder.computeDateTimeFormat(requireElementProperty(props.element, 'format'));
 
                 processedValue = event?.format(dateTimeFormat);
                 break;
@@ -87,7 +89,7 @@ export const FormField: React.FunctionComponent<FormFieldProps> = (props) => {
             props.form.handleChange(event);
         }
 
-        null !== props.renderProps?.onChange && props.renderProps.onChange(
+        undefined !== props.renderProps?.onChange && props.renderProps.onChange(
             event,
             processedValue !== undefined ? processedValue : event.target.value
         );
@@ -107,9 +109,9 @@ export const FormField: React.FunctionComponent<FormFieldProps> = (props) => {
                         >
                             <SelectField name={name}
                                          label={label}
-                                         options={props.element.options}
+                                         options={requireElementProperty(props.element, 'options')}
                                          value={props.value}
-                                         mode={props.element.mode}
+                                         mode={requireElementProperty(props.element, 'mode')}
                                          required={required}
                                          readonly={readonly}
                                          autoFocus={autoFocus}
@@ -130,9 +132,9 @@ export const FormField: React.FunctionComponent<FormFieldProps> = (props) => {
                             <AutocompleteField name={name}
                                                label={label}
                                                value={props.value}
-                                               route={props.element.route}
-                                               routeParameter={props.element.parameter}
-                                               mode={props.element.mode}
+                                               route={requireElementProperty(props.element, 'route')}
+                                               routeParameter={requireElementProperty(props.element, 'parameter')}
+                                               mode={requireElementProperty(props.element, 'mode')}
                                                required={required}
                                                readonly={readonly}
                                                autoFocus={autoFocus}
@@ -178,8 +180,8 @@ export const FormField: React.FunctionComponent<FormFieldProps> = (props) => {
                     {() => (
                         <Box key={name + 'Collection'} className={'d-flex gap-1 w-100' + elementClassName}>
                             <FormFields form={props.form}
-                                        elements={props.element.elements as ElementListType}
-                                        parents={[...props.parents, props.element.name]}
+                                        elements={requireElementProperty(props.element, 'elements') as ElementListType}
+                                        parents={[...parents, props.element.name]}
                                         renderProps={props.renderProps?.elements}
                                         callbacks={props.callbacks?.elements}
                             />
@@ -196,7 +198,7 @@ export const FormField: React.FunctionComponent<FormFieldProps> = (props) => {
                                      className={formControlClassNames.join(' ')}
                         >
                             <DateField label={label}
-                                       format={props.element.format}
+                                       format={requireElementProperty(props.element, 'format')}
                                        value={props.value}
                                        onChange={onChange}
                                        min={props.element.min}
@@ -219,7 +221,7 @@ export const FormField: React.FunctionComponent<FormFieldProps> = (props) => {
                                      className={formControlClassNames.join(' ')}
                         >
                             <DateTimeField label={label}
-                                           format={props.element.format}
+                                           format={requireElementProperty(props.element, 'format')}
                                            value={props.value}
                                            onChange={onChange}
                                            min={props.element.min}
@@ -351,7 +353,7 @@ export const FormField: React.FunctionComponent<FormFieldProps> = (props) => {
                 if (undefined !== props.callbacks) {
                     const findByKey = (key: unknown): [NullableNumberType, FormikValues | null] => {
                         for (const [index, elementValues] of props.value.entries()) {
-                            if (elementValues[props.element.key] === key) {
+                            if (elementValues[requireElementProperty(props.element, 'key')] === key) {
                                 return [index, elementValues];
                             }
                         }
@@ -363,7 +365,7 @@ export const FormField: React.FunctionComponent<FormFieldProps> = (props) => {
                         const [index] = findByKey(key);
 
                         if (index === null) {
-                            return null;
+                            return;
                         }
 
                         arrayHelpers.remove(index);
@@ -379,7 +381,7 @@ export const FormField: React.FunctionComponent<FormFieldProps> = (props) => {
                         const [index] = findByKey(key);
 
                         const elementValues = FormBuilder.createPrototypeCollectionElementValues(
-                            props.element.key,
+                            requireElementProperty(props.element, 'key'),
                             key,
                             {...values}
                         );
@@ -400,7 +402,7 @@ export const FormField: React.FunctionComponent<FormFieldProps> = (props) => {
                     props.value,
                     props.form,
                     props.element,
-                    props.parents,
+                    parents,
                     props.renderProps,
                     props.callbacks
                 );

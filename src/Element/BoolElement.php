@@ -30,6 +30,7 @@ class BoolElement extends AbstractElement
         return 'bool';
     }
 
+    /** @return array<string, mixed> */
     protected function renderElement(mixed $value): array
     {
         if (null !== $value && false === \is_bool($value)) {

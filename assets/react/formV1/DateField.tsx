@@ -15,10 +15,12 @@ export const DateField: React.FunctionComponent<DateFieldProps> = (props) => {
     const inputRef = React.useRef<any>(null);
 
     React.useEffect(() => {
-        if (inputRef.current !== null && props.autoFocus.current === true) {
+        const autoFocus = props.autoFocus;
+
+        if (inputRef.current !== null && undefined !== autoFocus && autoFocus.current === true) {
             inputRef.current.focus();
 
-            props.autoFocus.current = false;
+            autoFocus.current = false;
         }
     });
 
@@ -31,7 +33,7 @@ export const DateField: React.FunctionComponent<DateFieldProps> = (props) => {
                                minDate={props.min}
                                maxDate={props.max}
                                readOnly={props.readonly}
-                               autoFocus={props.autoFocus.current}
+                               autoFocus={props.autoFocus?.current}
                                renderInput={(params) => (
                                    <TextFieldBase name={props.name} {...params}/>
                                )}

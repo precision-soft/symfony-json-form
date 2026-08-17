@@ -30,13 +30,13 @@ export const AutocompleteField: React.FunctionComponent<AutocompleteFieldProps> 
     const [inputValue, setInputValue] = React.useState<string>('');
     const [options, setOptions] = React.useState<AutocompleteFieldOptionListType>([]);
 
-    const httpRequest = React.useRef<HttpRequest>(null);
+    const httpRequest = React.useRef<HttpRequest | null>(null);
 
     const urlGenerator = useUrlGenerator();
     const httpClient = useHttpClient();
 
     const onInputChange = (event: React.SyntheticEvent, value: NullableStringType, reason: AutocompleteInputChangeReason): void => {
-        setInputValue(value);
+        setInputValue(null === value ? '' : value);
 
         httpRequest.current?.abort();
 

@@ -1,0 +1,35 @@
+{
+    // The gate is `npm run typecheck` ( tsc --noEmit ), run by .dev/validate/all.sh and the pre-commit
+    // hook. There is no build step here: this package ships sources and the host application bundles
+    // them, so the compiler only ever checks - it never emits.
+    "compilerOptions": {
+        "target": "ES2022",
+        "lib": [
+            "ES2022",
+            "DOM",
+            "DOM.Iterable"
+        ],
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "jsx": "react",
+        "strict": true,
+        // The dependencies are declared in types/vendor.d.ts rather than installed, so a parameter of a
+        // callback handed to a library function has nothing to be inferred from and would report here
+        // with no defect behind it. strictNullChecks - the part of `strict` this gate exists for - is
+        // unaffected.
+        "noImplicitAny": false,
+        "noEmit": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "skipLibCheck": true,
+        "types": [],
+        "allowImportingTsExtensions": true
+    },
+    "include": [
+        "**/*.ts",
+        "**/*.tsx"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}

@@ -45,6 +45,15 @@ final class ArrayElementTest extends TestCase
         $arrayElement->render(['unknown']);
     }
 
+    public function testRenderWithNestedArrayValueThrowsException(): void
+    {
+        $arrayElement = new ArrayElement('status', 'label', ['active' => 'Active']);
+
+        static::expectException(InvalidValueException::class);
+
+        $arrayElement->render([['active']]);
+    }
+
     public function testRenderStructure(): void
     {
         $options = ['active' => 'Active', 'inactive' => 'Inactive'];

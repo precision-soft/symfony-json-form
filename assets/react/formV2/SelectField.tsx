@@ -125,7 +125,7 @@ export const SelectField: React.FunctionComponent<SelectFieldProps> = (props) =>
                             name={props.name}
                             value={props.value}
                             readOnly={props.readonly}
-                            autoFocus={props.autoFocus.current}
+                            autoFocus={props.autoFocus?.current}
                             onChange={props.onChange}
                             input={<OutlinedInput label={props.label}/>}
                             multiple

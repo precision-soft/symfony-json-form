@@ -30,6 +30,7 @@ class FileElement extends AbstractElement
         return 'file';
     }
 
+    /** @return array<string, mixed> */
     protected function renderElement(mixed $value): array
     {
         if (null !== $value) {

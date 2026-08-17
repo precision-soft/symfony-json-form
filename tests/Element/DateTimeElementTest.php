@@ -17,6 +17,20 @@ use PrecisionSoft\Symfony\JsonForm\Exception\InvalidValueException;
  */
 final class DateTimeElementTest extends TestCase
 {
+    public function testConstructWithUnparsableMinThrowsException(): void
+    {
+        static::expectException(InvalidValueException::class);
+
+        new DateTimeElement('startsAt', 'label', DateTimeElement::FORMAT_Y_M_D_H_I, min: 'not-a-date-time');
+    }
+
+    public function testConstructWithUnparsableMaxThrowsException(): void
+    {
+        static::expectException(InvalidValueException::class);
+
+        new DateTimeElement('startsAt', 'label', DateTimeElement::FORMAT_Y_M_D_H_I, max: '2020-12-31');
+    }
+
     public function testRenderWithNullValue(): void
     {
         $dateTimeElement = new DateTimeElement('startsAt', 'label');

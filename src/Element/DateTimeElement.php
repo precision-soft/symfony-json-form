@@ -31,6 +31,8 @@ class DateTimeElement extends AbstractElement
         protected readonly ?string $max = null,
     ) {
         parent::__construct($name, $label);
+
+        $this->validateBounds();
     }
 
     protected function getType(): string
@@ -38,6 +40,7 @@ class DateTimeElement extends AbstractElement
         return 'dateTime';
     }
 
+    /** @return array<string, mixed> */
     protected function renderElement(mixed $value): array
     {
         if (null !== $value && false === $this->isValidDate($value)) {

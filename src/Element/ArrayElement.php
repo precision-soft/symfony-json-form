@@ -27,6 +27,7 @@ class ArrayElement extends AbstractElement
         self::MODE_MULTIPLE,
     ];
 
+    /** @param array<int|string, string|array<int|string, string>> $options a flat value => label map, or a group label => value => label map */
     public function __construct(
         string $name,
         string $label,
@@ -45,10 +46,17 @@ class ArrayElement extends AbstractElement
         return 'array';
     }
 
+    /** @return array<string, mixed> */
     protected function renderElement(mixed $value): array
     {
         if (null !== $value) {
             $value = (array)$value;
+
+            foreach ($value as $item) {
+                if (false === \is_scalar($item)) {
+                    throw new InvalidValueException($this->getName(), $item);
+                }
+            }
 
             $diff = \array_diff($value, $this->getOptionsValues());
 
@@ -66,6 +74,7 @@ class ArrayElement extends AbstractElement
         ];
     }
 
+    /** @return list<int|string> */
     protected function getOptionsValues(): array
     {
         $optionsValues = [];

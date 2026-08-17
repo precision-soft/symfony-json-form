@@ -4,6 +4,7 @@ import {Form as FormBase, Formik, FormikValues, useFormikContext} from 'formik';
 import React from 'react';
 import {BlockUi} from '../component/BlockUi';
 import {useUrlGeneratorContext} from '../context/UrlGeneratorContext';
+import {computeInitialValues, createPrototypeCollectionElementValues} from '../service/Element';
 import {HttpRequest, useHttpClient} from '../service/HttpClient';
 import {StringArrayType} from '../type/Array';
 import {NullaryType, SetLoadingType} from '../type/Function';
@@ -12,7 +13,7 @@ import {BooleanRefType} from '../type/React';
 import {StringNumberType} from '../type/Scalar';
 import {FormButton} from './FormButton';
 import {FormFields, FormFieldsContainer} from './FormField';
-import {ButtonListType, ElementListType, ElementModeEnum, ElementTypeEnum, FormDataType, FormRenderPropsType, FormType, OnSubmitFailureType, OnSubmitSuccessType} from './Types';
+import {ButtonListType, ElementListType, FormDataType, FormRenderPropsType, FormType, OnSubmitFailureType, OnSubmitSuccessType} from './Types';
 
 export * from './Types';
 export * from './AutocompleteField';
@@ -51,54 +52,11 @@ export class FormBuilder {
     };
 
     static computeInitialValues = (elements: ElementListType): MapType => {
-        const initialValues = {};
-
-        Object.entries(elements).map(([name, element]) => {
-                switch (element.type) {
-                    case ElementTypeEnum.ARRAY:
-                        switch (element.mode) {
-                            case ElementModeEnum.SINGLE:
-                                const value = null !== element.value ? element.value : null;
-
-                                initialValues[name] = null !== value && 0 < element.value.length ? element.value[0] : null;
-                                break;
-                            default:
-                                initialValues[name] = null !== element.value ? element.value : [];
-                        }
-                        break;
-                    case ElementTypeEnum.BOOL:
-                        initialValues[name] = null !== element.value ? element.value : false;
-                        break;
-                    case ElementTypeEnum.COLLECTION:
-                        initialValues[name] = FormBuilder.computeInitialValues(element.elements as ElementListType);
-                        break;
-                    case ElementTypeEnum.PROTOTYPE_COLLECTION:
-                        initialValues[name] = [];
-
-                        Object.entries(element.elements as ElementListType[]).map(([key, elementsCollection]) =>
-                            initialValues[name].push(
-                                FormBuilder.createPrototypeCollectionElementValues(
-                                    element.key,
-                                    key,
-                                    FormBuilder.computeInitialValues(elementsCollection)
-                                )
-                            )
-                        );
-                        break;
-                    default:
-                        initialValues[name] = null !== element.value ? element.value : '';
-                }
-            }
-        );
-
-        return initialValues;
+        return computeInitialValues(elements);
     };
 
     static createPrototypeCollectionElementValues = (keyName: string, keyValue: StringNumberType, values: MapType): MapType => {
-        return {
-            [keyName]: keyValue,
-            ...values
-        };
+        return createPrototypeCollectionElementValues(keyName, keyValue, values);
     };
 
     static sliceElements = (elements: ElementListType, names: StringArrayType): ElementListType => {
@@ -269,7 +227,7 @@ export const Form: React.FunctionComponent<FormProps> = (props) => {
 
                 undefined !== props.beforeSend && props.beforeSend();
             })
-            .setOnError(() => undefined !== props.onSubmitFailure && props.onSubmitFailure())
+            .setOnError(() => undefined !== props.onSubmitFailure && props.onSubmitFailure(null))
             .setOnComplete(() => {
                 undefined !== props.onComplete && props.onComplete();
 

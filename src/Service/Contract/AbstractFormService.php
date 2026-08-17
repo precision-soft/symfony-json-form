@@ -17,12 +17,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Throwable;
 
 abstract class AbstractFormService
 {
-    protected SerializerInterface $serializer;
+    /** the intersection is required: `SerializerInterface` declares neither `normalize()` nor `denormalize()` */
+    protected SerializerInterface&NormalizerInterface&DenormalizerInterface $serializer;
 
     abstract protected function getDtoClass(): string;
 
@@ -32,13 +35,14 @@ abstract class AbstractFormService
 
     abstract protected function build(Form $form, DtoInterface $dto): void;
 
-    public function setSerializer(SerializerInterface $serializer): static
+    public function setSerializer(SerializerInterface&NormalizerInterface&DenormalizerInterface $serializer): static
     {
         $this->serializer = $serializer;
 
         return $this;
     }
 
+    /** @return array<string, mixed> */
     public function render(?DtoInterface $dto = null): array
     {
         if (null === $dto) {
@@ -82,6 +86,7 @@ abstract class AbstractFormService
         return $this->serializer->denormalize($data, $this->getDtoClass(), null, $context);
     }
 
+    /** @return array{array<string, mixed>, array<string, mixed>} the form's own payload, and the denormalization context */
     protected function getDataAndContext(Request $request): array
     {
         $context = [];
@@ -103,6 +108,10 @@ abstract class AbstractFormService
                             \sprintf('request body for form `%s` is not valid JSON', $this->getName()),
                             0,
                             $throwable,
+                            [
+                                'formName' => $this->getName(),
+                                'requestMethod' => $request->getMethod(),
+                            ],
                         );
                     }
                 } else {
@@ -122,7 +131,15 @@ abstract class AbstractFormService
             );
         }
 
-        return [$data[$this->getName()] ?? [], $context];
+        $formData = $data[$this->getName()] ?? [];
+
+        if (false === \is_array($formData)) {
+            throw new Exception(
+                \sprintf('`%1$s` in the request body for form `%1$s` must decode to an array', $this->getName()),
+            );
+        }
+
+        return [$formData, $context];
     }
 
     protected function getName(): string
@@ -134,12 +151,17 @@ abstract class AbstractFormService
         return false === $position ? $className : \substr($className, 0, $position);
     }
 
+    /**
+     * @param array<string, mixed> $data
+     *
+     * @return array<string, mixed>
+     */
     protected function sanitizeData(array $data): array
     {
         $sanitizedData = [];
 
         foreach ($data as $key => $value) {
-            /** @info empty arrays are dropped so an absent nested structure does not override DTO defaults; empty strings are kept so a `PATCH`/`PUT` can explicitly clear a field to `''` */
+            /* the asymmetry is deliberate: an empty array must not override a DTO default, an empty string must be able to clear a field */
             if (true === \is_array($value)) {
                 $value = $this->sanitizeData($value);
 

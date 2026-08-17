@@ -26,6 +26,13 @@ class NumberElement extends AbstractElement
         protected readonly ?float $step = null,
     ) {
         parent::__construct($name, $label);
+
+        if (null !== $this->min && null !== $this->max && $this->min > $this->max) {
+            throw new InvalidValueException(
+                \sprintf('min of `%s`', $name),
+                $this->min,
+            );
+        }
     }
 
     protected function getType(): string
@@ -33,10 +40,20 @@ class NumberElement extends AbstractElement
         return 'number';
     }
 
+    /** @return array<string, mixed> */
     protected function renderElement(mixed $value): array
     {
-        if (null !== $value && false === \is_numeric($value)) {
-            throw new InvalidValueException($this->getName(), $value);
+        if (null !== $value) {
+            if (false === \is_numeric($value)) {
+                throw new InvalidValueException($this->getName(), $value);
+            }
+
+            if (
+                (null !== $this->min && (float)$value < $this->min)
+                || (null !== $this->max && (float)$value > $this->max)
+            ) {
+                throw new InvalidValueException($this->getName(), $value);
+            }
         }
 
         return [

@@ -24,6 +24,7 @@ class HiddenElement extends AbstractElement
         return 'hidden';
     }
 
+    /** @return array<string, mixed> */
     protected function renderElement(mixed $value): array
     {
         if (null !== $value && false === \is_scalar($value)) {

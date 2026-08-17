@@ -19,6 +19,7 @@ abstract class AbstractElement
 
     abstract protected function getType(): string;
 
+    /** @return array<string, mixed> */
     abstract protected function renderElement(mixed $value): array;
 
     public function getName(): string
@@ -26,6 +27,7 @@ abstract class AbstractElement
         return $this->name;
     }
 
+    /** @return array<string, mixed> */
     public function render(mixed $value): array
     {
         if (false === \ctype_alnum($this->name)) {

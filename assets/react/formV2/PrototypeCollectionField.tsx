@@ -1,6 +1,7 @@
 import {Box} from '@mui/material';
 import {FieldArray, FormikValues} from 'formik';
 import React from 'react';
+import {requireElementProperty} from '../service/Element';
 import {clone} from '../service/Utility';
 import {StringArrayType} from '../type/Array';
 import {NullableNumberType} from '../type/Scalar';
@@ -33,7 +34,7 @@ type PrototypeCollectionFieldProps = {
     value: FormFieldValueType
     element: ElementType
     parents: StringArrayType,
-    renderProps: FormFieldRenderPropsType
+    renderProps?: FormFieldRenderPropsType
 }
 
 export const PrototypeCollectionField: React.FunctionComponent<PrototypeCollectionFieldProps> = (props) => {
@@ -42,11 +43,11 @@ export const PrototypeCollectionField: React.FunctionComponent<PrototypeCollecti
     const renderPrototypeCollectionComponent = (modifiers: PrototypeCollectionModifiersType) => {
         const collectionElements: PrototypeCollectionType[] = [];
         props.value.map((itemData, index) => collectionElements.push({
-            key: itemData[props.element.key],
+            key: itemData[requireElementProperty(props.element, 'key')],
             parents: [...props.parents, props.element.name, index]
         }));
 
-        const elements = clone<ElementListType>(props.element.prototype);
+        const elements = clone<ElementListType>(requireElementProperty(props.element, 'prototype'));
 
         if (undefined !== props.renderProps?.prototypeCollectionRender) {
             collectionElements.map((collectionElement) => {
@@ -72,7 +73,7 @@ export const PrototypeCollectionField: React.FunctionComponent<PrototypeCollecti
     const renderPrototypeCollection = (arrayHelpers) => {
         const findByKey = (key: unknown): [NullableNumberType, FormikValues | null] => {
             for (const [index, elementValues] of props.value.entries()) {
-                if (elementValues[props.element.key] === key) {
+                if (elementValues[requireElementProperty(props.element, 'key')] === key) {
                     return [index, elementValues];
                 }
             }
@@ -86,7 +87,7 @@ export const PrototypeCollectionField: React.FunctionComponent<PrototypeCollecti
             const [index] = findByKey(key);
 
             if (index === null) {
-                return null;
+                return;
             }
 
             arrayHelpers.remove(index);
@@ -102,7 +103,7 @@ export const PrototypeCollectionField: React.FunctionComponent<PrototypeCollecti
             const [index] = findByKey(key);
 
             const elementValues = FormBuilder.createPrototypeCollectionElementValues(
-                props.element.key,
+                requireElementProperty(props.element, 'key'),
                 key,
                 {...values}
             );

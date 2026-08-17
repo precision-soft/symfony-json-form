@@ -17,6 +17,20 @@ use PrecisionSoft\Symfony\JsonForm\Exception\InvalidValueException;
  */
 final class DateElementTest extends TestCase
 {
+    public function testConstructWithUnparsableMinThrowsException(): void
+    {
+        static::expectException(InvalidValueException::class);
+
+        new DateElement('birthday', 'label', DateElement::FORMAT_Y_M_D, min: 'not-a-date');
+    }
+
+    public function testConstructWithUnparsableMaxThrowsException(): void
+    {
+        static::expectException(InvalidValueException::class);
+
+        new DateElement('birthday', 'label', DateElement::FORMAT_Y_M_D, max: '31-12-2020');
+    }
+
     public function testRenderWithNullValue(): void
     {
         $dateElement = new DateElement('birthday', 'label');

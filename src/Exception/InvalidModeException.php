@@ -10,6 +10,7 @@ namespace PrecisionSoft\Symfony\JsonForm\Exception;
 
 class InvalidModeException extends Exception
 {
+    /** @param array<int, string> $acceptedModes */
     public function __construct(string $name, string $mode, array $acceptedModes)
     {
         parent::__construct(

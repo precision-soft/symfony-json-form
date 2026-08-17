@@ -1,12 +1,13 @@
 import {Box} from '@mui/material';
 import {FastField, FormikValues} from 'formik';
 import React from 'react';
+import {computeInitialValues, createPrototypeCollectionElementValues, requireElementProperty} from '../service/Element';
 import {clone} from '../service/Utility';
 import {StringArrayType} from '../type/Array';
 import {MapType} from '../type/Map';
 import {StringNumberType} from '../type/Scalar';
 import {FormFields} from './FormField';
-import {ElementListType, ElementModeEnum, ElementType, ElementTypeEnum, FormCallbacksType, FormFieldCallbacksType, FormFieldRenderPropsType, FormFieldValueType, FormType, PrototypeCollectionType} from './Types';
+import {ElementListType, ElementType, FormCallbacksType, FormFieldCallbacksType, FormFieldRenderPropsType, FormFieldValueType, FormType, PrototypeCollectionType} from './Types';
 
 export class FormBuilder {
     static computeDateFormat = (elementFormat: string): string => {
@@ -34,50 +35,10 @@ export class FormBuilder {
     };
 
     static computeInitialValues = (elements: ElementListType): MapType => {
-        const initialValues = {};
-
-        Object.entries(elements).map(([name, element]) => {
-                switch (element.type) {
-                    case ElementTypeEnum.ARRAY:
-                        switch (element.mode) {
-                            case ElementModeEnum.SINGLE:
-                                const value = null !== element.value ? element.value : null;
-
-                                initialValues[name] = null !== value && 0 < element.value.length ? element.value[0] : null;
-                                break;
-                            default:
-                                initialValues[name] = null !== element.value ? element.value : [];
-                        }
-                        break;
-                    case ElementTypeEnum.BOOL:
-                        initialValues[name] = null !== element.value ? element.value : false;
-                        break;
-                    case ElementTypeEnum.COLLECTION:
-                        initialValues[name] = FormBuilder.computeInitialValues(element.elements as ElementListType);
-                        break;
-                    case ElementTypeEnum.PROTOTYPE_COLLECTION:
-                        initialValues[name] = [];
-
-                        Object.entries(element.elements as ElementListType[]).map(([key, elementsCollection]) =>
-                            initialValues[name].push(
-                                FormBuilder.createPrototypeCollectionElementValues(
-                                    element.key,
-                                    key,
-                                    FormBuilder.computeInitialValues(elementsCollection)
-                                )
-                            )
-                        );
-                        break;
-                    default:
-                        initialValues[name] = null !== element.value ? element.value : '';
-                }
-            }
-        );
-
-        return initialValues;
+        return computeInitialValues(elements);
     };
 
-    static initCallbacks = (callbacks: FormCallbacksType): void => {
+    static initCallbacks = (callbacks?: FormCallbacksType): void => {
         if (undefined === callbacks) {
             return;
         }
@@ -86,10 +47,7 @@ export class FormBuilder {
     };
 
     static createPrototypeCollectionElementValues = (keyName: string, keyValue: StringNumberType, values: MapType): MapType => {
-        return {
-            [keyName]: keyValue,
-            ...values
-        };
+        return createPrototypeCollectionElementValues(keyName, keyValue, values);
     };
 
     static renderPrototypeCollection = (
@@ -99,16 +57,16 @@ export class FormBuilder {
         form: FormType,
         element: ElementType,
         parents: StringArrayType,
-        renderProps: FormFieldRenderPropsType,
-        callbacks: FormFieldCallbacksType
+        renderProps: FormFieldRenderPropsType | undefined,
+        callbacks: FormFieldCallbacksType | undefined
     ) => {
         const collectionElements: PrototypeCollectionType[] = [];
         values.map((itemData, index) => collectionElements.push({
-            key: itemData[element.key],
+            key: itemData[requireElementProperty(element, 'key')],
             parents: [...parents, element.name, index]
         }));
 
-        const elements = clone<ElementListType>(element.prototype);
+        const elements = clone<ElementListType>(requireElementProperty(element, 'prototype'));
 
         if (undefined !== renderProps?.prototypeCollectionRender) {
             collectionElements.map((collectionElement) => {

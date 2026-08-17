@@ -30,6 +30,7 @@ class PasswordElement extends AbstractElement
         return 'password';
     }
 
+    /** @return array<string, mixed> */
     protected function renderElement(mixed $value): array
     {
         if (null !== $value && false === \is_string($value)) {

@@ -2,10 +2,65 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [v1.1.0] - 2026-08-17 - Optional render props no longer crash the form, and the package gets phpstan and a typecheck
+
+### Fixed
+
+- `assets/react/formV1/FormField.tsx`, `assets/react/formV2/FormField.tsx` — the field-level change handler guarded the optional `renderProps.onChange` with `null !== props.renderProps?.onChange` and then dereferenced
+  `props.renderProps.onChange`. `renderProps` and `onChange` are both **optional**, so the guard compared `undefined`
+  against `null`, passed, and threw `TypeError: Cannot read properties of undefined` on every change of any field the host did not configure — which is the default usage. Guarded with `undefined !==` instead
+- `assets/react/formV2/FormField.tsx` — the `bool` branch read `props.renderProps.checkboxIcon` and
+  `props.renderProps.checkboxCheckedIcon` off the optional `renderProps` with no guard at all, throwing for every checkbox rendered without render props (formV1 has no checkbox render props and was not affected)
+- `assets/react/formV1/FormButtons.tsx`, `assets/react/formV2/FormButton.tsx` — the reset and cancel buttons guarded the click callback with `null !== onClick`, but the third element of `ButtonType` is optional, so a button declared without one threw `TypeError: onClick is not a function` when clicked
+- `assets/react/formV1/{TextField,DateField,DateTimeField,SelectField}.tsx` and their formV2 counterparts —
+  `props.autoFocus.current` was read (and written) unguarded although `FocusType.autoFocus` is optional, so a component used directly rather than through `FormField` threw on mount
+- `assets/react/service/HttpClient.ts` — `jqXhr.responseJSON` is **absent**, not null, when the response body is not json, so `null !== jqXhr.responseJSON?.errors` was always true and the `'invalid backend response received'` fallback never fired for the case it was written for; `error()` then received `undefined` and reported nothing.
+  `getFormDataFromResponse()` and `getXhrJsonResponse()` returned `undefined` where their declared return types promised a value or `null`. All three now use `??`
+- `assets/react/service/Element.ts` — computing the initial value of a single-mode `array` element read
+  `element.value.length` after checking a different variable for null, throwing when the `value` key was absent
+- `src/Service/Contract/AbstractFormService.php` — `getDataAndContext()` type-checked the decoded body but not the form's own key inside it, so a payload such as `{"myForm": "text"}` reached `sanitizeData(array $data)` and raised a raw `TypeError` — the exact failure the enclosing check was added in v1.0.6 to prevent. It now throws the bundle's
+  `Exception`
+- `src/Element/ArrayElement.php` — a non-scalar item in the value reached `array_diff()`, which raised
+  `Array to string conversion` and compared the item as the string `Array`; it now throws `InvalidValueException`, matching the guard `PrototypeCollectionElement` received in v1.0.7
+- `src/Exception/InvalidValueException.php` — `serialize()` called `implode()` on the value, so an array containing an array raised `Array to string conversion` and reported `Array`: the exception whose job is to name the bad value corrupted it. It now serializes recursively
+- `src/Element/Trait/DateValidationTrait.php` — a `$min`/`$max` that does not parse in the element's own `$format` was silently skipped by `isWithinRange()`, so a typo disabled the range check without any signal. Both bounds are now validated in the constructor and throw `InvalidValueException`
+
+### Changed
+
+- `src/Service/Contract/AbstractFormService.php` — `$serializer` and `setSerializer()` now require
+  `SerializerInterface&NormalizerInterface&DenormalizerInterface`. `render()` calls `normalize()` and `handleRequest()`
+  calls `denormalize()`, neither of which `SerializerInterface` declares; the previous declaration accepted an implementation that would fatal at the first call. Symfony's `Serializer` — what the `SerializerInterface` service resolves to — satisfies the intersection, so the documented wiring is unaffected
+- `src/Element/NumberElement.php` — `$min`/`$max` are now enforced server-side as an inclusive range and a value outside it throws `InvalidValueException`, matching what `DateElement`/`DateTimeElement` have done since v1.0.7; a `$min`
+  greater than `$max` throws at construction. `$step` remains a frontend hint (behavior change for consumers that relied on `$min`/`$max` being client-side hints only)
+- `assets/react/formV1/Types.ts`, `assets/react/formV2/Types.ts` — `ElementType.label` and `FieldType.label` are nullable, because `AbstractElement` takes `?string $label` and renders it as it is; `OnSubmitSuccessType`'s data and
+  `OnSubmitFailureType`'s errors are nullable, because the response carries null for both; the prototype collection
+  `get()` modifier returns null when no row matches, which it always could
+- `phpunit.xml` → `phpunit.xml.dist` — the suite ran on **PHPUnit 9** while every sibling package runs 11.5; the config still used the 9.3 schema and the `<coverage processUncoveredFiles>` and `<listeners>` elements both removed in PHPUnit 10, and set neither `failOnRisky` nor `failOnWarning`. Now 11.5 with both, which is what turned the
+  `ArrayElement` warning above into a failing test rather than a line of ignored output
+- `assets/react/service/Element.ts` — new shared module holding the schema logic both versions had a copy of (`computeInitialValues`, `createPrototypeCollectionElementValues`) plus `requireElementProperty`, which turns a rendered element missing a property its own type always carries into a named error instead of an `undefined` handed to a component several frames away. `FormBuilder` in both versions delegates to it and its public API is unchanged
+- comments across the package normalized to the house rule — the default is no comment, and a warranted one is a single short line. Every multi-line rationale block, narrative test docblock and shell section header was removed; the `.dev/` scripts, the `Dockerfile` and the compose file now carry nothing but their shebang and one line about `tini` as PID 1. Nothing behavioral changed. `CONTRIBUTING.md` gained the two sections that now carry the rationale — *Development toolchain* (the pinned pcov and infection builds, the `php.dev.ini` overlay, the pinned node/typescript and why there is no vitest, the mutation thresholds) and *Continuous integration* (the four jobs including `js`, and why `--fail-on-skipped` is passed in CI only) — and its *Verification* section now documents `.dev/validate/all.sh`, its flags and the two-language gate, replacing the stale description of the old hook
+
+### Added
+
+- `Contract\ExceptionInterface` and `Exception\Trait\ExceptionTrait` — exceptions now carry a structured `context` array alongside the message, read with `getContext()` and set with `setContext()` or the new fourth constructor argument. The context is purely additive: no existing message, code or previous throwable changed, so a consumer logging only `getMessage()` sees exactly what it saw before. Ported from `precision-soft/symfony-console`, which has carried it since v4.5.0, so every package in the portfolio now exposes the same contract. Note for consumers subclassing the package exception: a subclass that already declares its own `$context` property or a `getContext()`/`setContext()` method will collide with the trait
+- coverage for the two request-handling contracts that only POST had ever exercised. **`PUT` and `PATCH` are now tested**: they share one `switch` case with `POST` in `getDataAndContext()`, and every test in the suite drove `POST`, so dropping either label — which sends that method to the `default:` arm and its *"can not handle"* exception — left the whole suite green. Both are documented request methods, and outside `POST` nothing proved a form could handle a body at all. **And `handleRequest()`'s `$sanitizeData` default is asserted**: `sanitizeData()` was covered directly but nothing exercised the default that applies it, so flipping it would have silently stopped sanitising every payload in every consumer. The two states are separated by populating an existing dto, where a dropped empty array leaves the previous value in place and an unsanitised one overwrites it
+- `AbstractFormService::getDataAndContext()` — a malformed JSON request body now reports `formName` and `requestMethod` in the exception context. The form name was only ever available interpolated into the message, and the request method was not reported at all
+- `assets/react/tsconfig.json`, `assets/react/types/vendor.d.ts` and the host-module `.d.ts` stubs — `tsc --noEmit` at
+  `strict`, wired into `composer check`'s neighbour `.dev/validate/all.sh` and the pre-commit hook. The package ships sources only, so the compiler lives in the dev image and the dependencies are declared rather than installed; the stubs beside the host-provided import paths double as the contract the host application has to satisfy. The first run reported 196 errors, every one of the crash-grade fixes above among them
+- `phpstan.neon` — phpstan level 8 over `src/` and `tests/`, in `composer check`. **No baseline**: the 39 errors of the first run are all fixed, and two of them were the `SerializerInterface` defect above
+- `tests/Functional/FormRoundTripFunctionalTest.php` — the package's first end-to-end test, `@group integration`, run by the new `composer test-integration`: a real form service renders a DTO to json, that json returns as a real request body, and the service denormalizes it back. It proved the documented sanitize asymmetry end to end — an empty string clears the field, an empty array leaves the DTO default standing — and found that `TestDto` had no setters, so the round trip had been writing nothing while the assertions compared defaults to defaults
+- `assets/react/service/Element.test.ts` — node test coverage for the extracted schema logic (4 → 19 node tests)
+- `tests/Element/`, `tests/Form/`, `tests/Exception/` — coverage pinning every fix above, each verified to fail against the code before it (108 → 120 phpunit tests)
+
+### Removed
+
+- `phpcs.xml` and the `squizlabs/php_codesniffer` dev dependency — the pre-commit hook replaced `phpcs` with
+  `php-cs-fixer` in v1.0.6 and nothing has invoked phpcs since; the ruleset still pointed at `bin/`, `config/` and
+  `public/`, none of which exist in this repository
 
 ## [v1.0.7] - 2026-06-17 - Strict Date Validation And Min/Max Range Enforcement
 
@@ -142,7 +197,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - React form components (formV1, formV2) with TypeScript types, autocomplete, date, datetime, select, and collection field support
 - Docker-based development environment with git hooks
 
-[Unreleased]: https://github.com/precision-soft/symfony-json-form/compare/v1.0.7...HEAD
+[Unreleased]: https://github.com/precision-soft/symfony-json-form/compare/v1.1.0...HEAD
+
+[v1.1.0]: https://github.com/precision-soft/symfony-json-form/compare/v1.0.7...v1.1.0
 
 [v1.0.7]: https://github.com/precision-soft/symfony-json-form/compare/v1.0.6...v1.0.7
 

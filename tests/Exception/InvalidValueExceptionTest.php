@@ -9,7 +9,9 @@ declare(strict_types=1);
 namespace PrecisionSoft\Symfony\JsonForm\Test\Exception;
 
 use PHPUnit\Framework\TestCase;
+use PrecisionSoft\Symfony\JsonForm\Exception\Exception;
 use PrecisionSoft\Symfony\JsonForm\Exception\InvalidValueException;
+use stdClass;
 
 /**
  * @internal
@@ -37,9 +39,16 @@ final class InvalidValueExceptionTest extends TestCase
         static::assertSame('invalid value `a, b, c` for `fieldname`', $invalidValueException->getMessage());
     }
 
+    public function testMessageWithNestedArrayValue(): void
+    {
+        $invalidValueException = new InvalidValueException('fieldname', ['a', ['b', 'c'], new stdClass()]);
+
+        static::assertSame('invalid value `a, b, c, stdClass` for `fieldname`', $invalidValueException->getMessage());
+    }
+
     public function testMessageWithObjectValue(): void
     {
-        $object = new \stdClass();
+        $object = new stdClass();
         $invalidValueException = new InvalidValueException('fieldname', $object);
 
         static::assertSame('invalid value `stdClass` for `fieldname`', $invalidValueException->getMessage());
@@ -56,6 +65,6 @@ final class InvalidValueExceptionTest extends TestCase
     {
         $invalidValueException = new InvalidValueException('field', 'value');
 
-        static::assertInstanceOf(\PrecisionSoft\Symfony\JsonForm\Exception\Exception::class, $invalidValueException);
+        static::assertInstanceOf(Exception::class, $invalidValueException);
     }
 }

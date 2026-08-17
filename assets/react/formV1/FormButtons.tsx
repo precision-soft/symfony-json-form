@@ -18,7 +18,7 @@ export const FormButtons: React.FunctionComponent<FormButtonsProps> = (props) =>
 
     const buttonsList: ButtonListType =
         props.buttons === undefined ? {[ButtonTypeEnum.SUBMIT]: [<Icon name="check"/>, 'button.ok']} : props.buttons;
-    /** @info hack for ts compiler */
+    /* `Object.entries` widens the value away, so the tuple shape is restated here */
     const buttons: [string, [React.ReactElement, string, NullaryType?]][] = Object.entries(buttonsList);
 
     return (
@@ -44,7 +44,7 @@ export const FormButtons: React.FunctionComponent<FormButtonsProps> = (props) =>
                                                 onClick={() => {
                                                     props.form.resetForm();
 
-                                                    null !== onClick && onClick();
+                                                    undefined !== onClick && onClick();
                                                 }}
                                     >
                                         {icon}{languageContext.translate(label)}
@@ -54,7 +54,7 @@ export const FormButtons: React.FunctionComponent<FormButtonsProps> = (props) =>
                                 return (
                                     <ButtonBase key={type}
                                                 {...buttonErrorOutlined}
-                                                onClick={() => null !== onClick && onClick()}
+                                                onClick={() => undefined !== onClick && onClick()}
                                     >
                                         {icon}{languageContext.translate(label)}
                                     </ButtonBase>

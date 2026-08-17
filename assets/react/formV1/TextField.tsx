@@ -15,14 +15,16 @@ export const TextField: React.FunctionComponent<TextFieldProps> = (props) => {
     const inputRef = React.useRef<any>(null);
 
     React.useEffect(() => {
-        if (inputRef.current !== null && props.autoFocus.current === true) {
+        const autoFocus = props.autoFocus;
+
+        if (inputRef.current !== null && undefined !== autoFocus && autoFocus.current === true) {
             if (0 < props.value.length && true === props.selectOnFocus) {
                 inputRef.current.select();
             } else {
                 inputRef.current.focus();
             }
 
-            props.autoFocus.current = false;
+            autoFocus.current = false;
         }
     });
 
