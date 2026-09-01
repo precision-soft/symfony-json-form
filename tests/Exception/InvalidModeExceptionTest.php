@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace PrecisionSoft\Symfony\JsonForm\Test\Exception;
 
 use PHPUnit\Framework\TestCase;
+use PrecisionSoft\Symfony\JsonForm\Exception\Exception;
 use PrecisionSoft\Symfony\JsonForm\Exception\InvalidModeException;
 
 /**
@@ -30,6 +31,6 @@ final class InvalidModeExceptionTest extends TestCase
     {
         $invalidModeException = new InvalidModeException('status', 'wrong', ['single']);
 
-        static::assertInstanceOf(\PrecisionSoft\Symfony\JsonForm\Exception\Exception::class, $invalidModeException);
+        static::assertInstanceOf(Exception::class, $invalidModeException);
     }
 }

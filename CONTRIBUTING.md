@@ -57,11 +57,11 @@ Mutation thresholds live in [`infection.json5`](./infection.json5) (`minMsi`, `m
 
 ### Continuous integration
 
-[`.github/workflows/ci.yml`](./.github/workflows/ci.yml) cannot call `.dev/validate/all.sh` — the script needs Docker and a compose project — so it runs the same composer scripts natively across a PHP version matrix instead. Four jobs: `static` (out of the matrix, since `cs-check` reads the same bytes on every interpreter), `test` (`phpstan` and the suite on 8.2, 8.3 and 8.4, because phpstan's inference follows the interpreter), `js` (`tsc --noEmit` and `node --test`, on Node rather than on the PHP matrix) and `audit`.
+[`.github/workflows/ci.yml`](./.github/workflows/ci.yml) cannot call `.dev/validate/all.sh` — the script needs Docker and a compose project — so it runs the same composer scripts natively across a PHP version matrix instead. Five jobs: `static` (out of the matrix, since `cs-check` reads the same bytes on every interpreter), `test` (`phpstan` and the suite on PHP 8.2 through 8.5), `js` (`tsc --noEmit` and `node --test`), `symfony-latest` (resolves the highest allowed Symfony set on PHP 8.5) and `audit`.
 
 CI passes `--fail-on-skipped`, which is deliberately not in `phpunit.xml.dist`: locally a test whose precondition is absent is a skip, so `composer check` stays fast and offline, while in CI a silently skipped test must fail instead of printing a screen of green skips.
 
-Every job installs the locked dependencies and never resolves its own, so the analysers certify the code against the versions this repository ships. The `vendor/bin/.phpunit` cache step comes *after* the install, because `simple-phpunit` builds a tree `composer.lock` does not describe and composer owns `vendor/`, so it would clean a pre-restored directory back out.
+Every job that needs a `vendor/` installs the locked dependencies rather than resolving its own, so the analysers certify the code against the versions this repository ships. Two jobs are outside that rule: `symfony-latest`, which deliberately drops the `config.platform.php` pin and resolves the upper dependency bound, and `audit`, which reads `composer.lock` directly and never installs at all. The `vendor/bin/.phpunit` cache step comes *after* the install, because `simple-phpunit` builds a tree `composer.lock` does not describe and composer owns `vendor/`, so it would clean a pre-restored directory back out.
 
 ## Development workflow
 

@@ -51,11 +51,9 @@ abstract class AbstractFormService
             $dto = new $dtoClass();
         }
 
-        $formName = $this->getName();
+        $this->validateDtoClass($dto);
 
-        if ($dto::class !== $this->getDtoClass()) {
-            throw new Exception(\sprintf('invalid dto class for form `%s`', $formName));
-        }
+        $formName = $this->getName();
 
         $action = $this->getAction($dto);
 
@@ -63,7 +61,7 @@ abstract class AbstractFormService
 
         $this->build($form, $dto);
 
-        $data = (array)$this->serializer->normalize($dto);
+        $data = (array)$this->serializer->normalize($dto, null, $this->getNormalizationContext());
 
         return $form->render($data);
     }
@@ -79,11 +77,27 @@ abstract class AbstractFormService
             $data = $this->sanitizeData($data);
         }
 
+        $context = \array_replace($this->getDenormalizationContext(), $context);
+
         if (null !== $dto) {
+            $this->validateDtoClass($dto);
+
             $context[AbstractNormalizer::OBJECT_TO_POPULATE] = $dto;
         }
 
         return $this->serializer->denormalize($data, $this->getDtoClass(), null, $context);
+    }
+
+    protected function validateDtoClass(DtoInterface $dto): void
+    {
+        if ($dto::class !== $this->getDtoClass()) {
+            throw (new Exception(\sprintf('invalid dto class for form `%s`', $this->getName())))
+                ->setContext([
+                    'formName' => $this->getName(),
+                    'dtoClass' => $dto::class,
+                    'expectedDtoClass' => $this->getDtoClass(),
+                ]);
+        }
     }
 
     /** @return array{array<string, mixed>, array<string, mixed>} the form's own payload, and the denormalization context */
@@ -140,6 +154,18 @@ abstract class AbstractFormService
         }
 
         return [$formData, $context];
+    }
+
+    /** @return array<string, mixed> */
+    protected function getNormalizationContext(): array
+    {
+        return [];
+    }
+
+    /** @return array<string, mixed> */
+    protected function getDenormalizationContext(): array
+    {
+        return [];
     }
 
     protected function getName(): string

@@ -6,6 +6,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [v1.2.0] - 2026-09-01 - Serializer context hooks for value objects, and Symfony 8 support
+
+### Added
+
+- `AbstractFormService::getNormalizationContext()` and `getDenormalizationContext()` — two protected hooks that let a form declare Symfony Serializer context without replacing `render()` or `handleRequest()`. This is what lets a DTO hold a real `DateTimeImmutable` instead of a string: with no `datetime_format` the serializer normalizes it to RFC3339, which then fails the element's own format validation. The context derived from the request wins over the form's, and the `$dto` argument of `handleRequest()` always wins over an `OBJECT_TO_POPULATE` the form declared
+- `tests/Service/Contract/AbstractFormServiceTest.php` — the first unit coverage `AbstractFormService` has had, so both hooks and both precedence rules are exercised by `composer test` and by the mutation gate rather than only by the `integration` group, which both of those exclude
+- Functional round trips for both wire formats — `Y-m-d H:i` through `DateTimeElement`, and date-only `Y-m-d` through `DateElement`. The second pins down why the denormalization format is prefixed with `!`: `createFromFormat()` fills in every field the format does not carry, so a bare `Y-m-d` reads the hour, minute and second off the system clock and stamps them onto the DTO. Normalization takes the same format *without* the prefix, because `DateTimeInterface::format()` has no escape character and would emit the `!` literally
+
+### Fixed
+
+- `AbstractFormService::handleRequest()` now rejects a `$dto` whose class is not the form's `getDtoClass()`, the guard `render()` has always had. The serializer only populates an `OBJECT_TO_POPULATE` that is an instance of the target class, so a mismatched dto was dropped without a word: `handleRequest()` returned a freshly constructed object and left the one the caller passed untouched, silently writing nothing for a caller that populates in place. Both call sites now go through `validateDtoClass()`, and the exception carries the form name, the dto class it got and the one it wanted
+
+### Changed
+
+- `symfony/http-foundation`, `symfony/serializer` and `symfony/property-access` now accept `^7.0 || ^8.0`. The CI matrix covers PHP 8.2 through 8.5, and a `symfony-latest` job resolves the highest allowed dependency set on PHP 8.5. That job drops the platform pin, asserts the resolution actually reached Symfony 8 — without which it would go green on a Symfony 7 tree and prove nothing — and runs the integration suite, which is where the serializer-context round trips live
+- `symfony/property-info` is now declared in `require-dev`. The tests import it directly, but it was only ever arriving transitively through `symfony/property-access`
+- `config.platform.php` is pinned to `8.2`, the advertised floor, so `composer.lock` always resolves for the lowest supported interpreter no matter which container or CI job produced it
+- All dependencies refreshed. `precision-soft/symfony-phpunit` moves v3.5.0 → v3.6.0, which widens `symfony/phpunit-bridge` and `symfony/string` to `^7.0 || ^8.0`; that release is what makes a genuine Symfony 8 resolution reachable at all
+
+### Removed
+
+- `symfony/translation-contracts` is no longer a requirement. Nothing in `src/` or `tests/` referenced it and no other package pulled it in, so it was a hard runtime dependency imposed on every consumer for nothing. The only translation in this repository is the react `Translator.ts`, which is wired to `willdurand/js-translation-bundle` on the host and needs no php package here
+
 ## [v1.1.0] - 2026-08-17 - Optional render props no longer crash the form, and the package gets phpstan and a typecheck
 
 ### Fixed
@@ -197,7 +220,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - React form components (formV1, formV2) with TypeScript types, autocomplete, date, datetime, select, and collection field support
 - Docker-based development environment with git hooks
 
-[Unreleased]: https://github.com/precision-soft/symfony-json-form/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/precision-soft/symfony-json-form/compare/v1.2.0...HEAD
+
+[v1.2.0]: https://github.com/precision-soft/symfony-json-form/compare/v1.1.0...v1.2.0
 
 [v1.1.0]: https://github.com/precision-soft/symfony-json-form/compare/v1.0.7...v1.1.0
 

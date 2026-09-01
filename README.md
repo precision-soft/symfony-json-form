@@ -212,6 +212,7 @@ Each element renders to a json node with a `type` the frontend dispatches on. Al
   `request->all()` when the body is empty).
 * A request body that decodes to a non-array scalar (e.g. `5`) throws an `Exception` rather than a raw `TypeError`, and so does the form's own key inside it (e.g. `{"myForm": "text"}`).
 * Pass an existing `$dto` to populate it in place (`OBJECT_TO_POPULATE`) — useful for `PATCH`/`PUT`.
+* A `$dto` whose class is not the form's `getDtoClass()` throws an `Exception`, the same guard `render()` has always had. Previously the serializer dropped it silently, returned a freshly constructed dto and left the object you passed untouched.
 
 When `$sanitizeData` is `true` (default), `sanitizeData()` applies the following rules before denormalization:
 
@@ -219,6 +220,33 @@ When `$sanitizeData` is `true` (default), `sanitizeData()` applies the following
 * **empty strings are kept** — so a `PATCH`/`PUT` can explicitly clear a field by sending `""`.
 
 Pass `sanitizeData: false` to denormalize the raw payload unchanged.
+
+### Serializer context
+
+`render()` and `handleRequest()` hand a context array to the serializer, and a form declares its own by overriding two hooks:
+
+```php
+protected const FORMAT = DateElement::FORMAT_Y_M_D;
+
+protected function getNormalizationContext(): array
+{
+    return [DateTimeNormalizer::FORMAT_KEY => static::FORMAT];
+}
+
+protected function getDenormalizationContext(): array
+{
+    return [DateTimeNormalizer::FORMAT_KEY => '!' . static::FORMAT];
+}
+```
+
+This is what lets a DTO hold a real `DateTimeImmutable` rather than a string: with no `datetime_format` the serializer normalizes it to RFC3339, which then fails the element's own format validation.
+
+The two formats are deliberately not the same string:
+
+* **normalization** takes it bare — `DateTimeInterface::format()` has no escape character, so a leading `!` would be emitted literally, as `!1990-05-17`;
+* **denormalization** takes it prefixed with `!` — `createFromFormat()` fills in every field the format does not carry, and for a format with no time part at all (`Y-m-d`) that means reading the hour, minute and second off the system clock. `!` resets them to zero instead. For `Y-m-d H:i` only the seconds are at stake and php already zeroes them, but the prefix is the safe default either way.
+
+Precedence: the context derived from the request wins over `getDenormalizationContext()`, and the `$dto` argument of `handleRequest()` always wins over an `OBJECT_TO_POPULATE` the form declared.
 
 ## React
 
@@ -321,4 +349,4 @@ After editing a file, `./dc restart dev` (a few seconds) is enough to be sure th
 
 ## Todo
 
-* Render and handle complex types like `\DateTime` in DTO denormalization.
+* Per-property serializer context, so one DTO can mix date-only and date-time properties: `datetime_format` currently applies to the whole DTO.
