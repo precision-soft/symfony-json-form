@@ -118,6 +118,12 @@ if [[ "true" = "${RUN_EXAMPLE_SECTION}" ]]; then
     if [[ -f ".example/composer.json" ]]; then
         run_section "example" "${TAG_VALIDATE}" "php" -- \
             run_in_service_shell "${CONTAINER_DEV}" "cd .example && composer install --no-interaction --no-progress && composer check"
+
+        run_section "example typecheck" "${TAG_VALIDATE}" "js" -- \
+            run_in_service_shell "${CONTAINER_DEV}" "cd .example/assets/react && npm run --silent typecheck"
+
+        run_section "example test" "${TAG_VALIDATE}" "js" -- \
+            run_in_service_shell "${CONTAINER_DEV}" "cd .example/assets/react && node --test"
     else
         info "skip example ( no .example/composer.json in this repository )"
     fi

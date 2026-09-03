@@ -1,0 +1,10 @@
+{
+    "name": "precision-soft-symfony-json-form-example",
+    "description": "The product editor rendered by both react form versions from the json the backend produced; typechecked and tested with the compiler and the node runner baked into the dev image (no dependencies here).",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "test": "node --test",
+        "typecheck": "tsc --noEmit"
+    }
+}

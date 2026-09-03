@@ -134,6 +134,24 @@ jobs:
                 with:
                     php-version: '8.4'
                     coverage: none
+            -   if: steps.example.outputs.present == 'true'
+                uses: actions/setup-node@v7
+                with:
+                    node-version: '24'
+            -   name: read the pinned typescript version from the dev image
+                if: steps.example.outputs.present == 'true'
+                id: example-typescript
+                run: |
+                    set -euo pipefail
+                    TYPESCRIPT_VERSION="$(sed -n 's/^ARG TYPESCRIPT_VERSION=//p' .dev/docker/Dockerfile)"
+                    if [ -z "${TYPESCRIPT_VERSION}" ]; then
+                        echo "no ARG TYPESCRIPT_VERSION in .dev/docker/Dockerfile" >&2
+                        exit 1
+                    fi
+                    echo "version=${TYPESCRIPT_VERSION}" >> "${GITHUB_OUTPUT}"
+            -   name: install typescript
+                if: steps.example.outputs.present == 'true'
+                run: npm install -g typescript@${{ steps.example-typescript.outputs.version }}
             -   name: resolve the composer cache directory
                 if: steps.example.outputs.present == 'true'
                 id: composer-cache
@@ -152,6 +170,14 @@ jobs:
                 if: steps.example.outputs.present == 'true'
                 working-directory: .example
                 run: composer check
+            -   name: typecheck the example's react half
+                if: steps.example.outputs.present == 'true'
+                working-directory: .example/assets/react
+                run: npm run --silent typecheck
+            -   name: test the example's react half
+                if: steps.example.outputs.present == 'true'
+                working-directory: .example/assets/react
+                run: node --test
 
     # every other lane installs composer.lock so the analysers certify one reproducible dependency set;
     # this one resolves the upper bound instead, on the only interpreter Symfony 8 will install on

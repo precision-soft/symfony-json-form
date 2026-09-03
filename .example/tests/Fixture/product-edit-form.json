@@ -1,0 +1,254 @@
+{
+    "name": "productEditForm",
+    "method": "POST",
+    "action": {
+        "route": "catalogue-product-edit",
+        "parameters": {
+            "id": 7
+        }
+    },
+    "elements": {
+        "id": {
+            "type": "hidden",
+            "name": "id",
+            "label": null,
+            "value": 7
+        },
+        "name": {
+            "type": "string",
+            "name": "name",
+            "label": "name",
+            "readonly": false,
+            "required": false,
+            "value": "Desk lamp"
+        },
+        "price": {
+            "type": "number",
+            "name": "price",
+            "label": "price",
+            "min": 0.0,
+            "max": 1000000.0,
+            "step": 0.01,
+            "readonly": false,
+            "required": false,
+            "value": 149.9
+        },
+        "priceHint": {
+            "type": "label",
+            "name": "priceHint",
+            "label": "the price is in the product currency",
+            "value": null
+        },
+        "currency": {
+            "type": "array",
+            "name": "currency",
+            "label": "currency",
+            "options": {
+                "EUR": "Euro",
+                "RON": "Romanian leu"
+            },
+            "mode": "single",
+            "readonly": false,
+            "required": false,
+            "value": [
+                "RON"
+            ]
+        },
+        "channels": {
+            "type": "array",
+            "name": "channels",
+            "label": "sales channels",
+            "options": {
+                "web": "Web shop",
+                "store": "Store"
+            },
+            "mode": "multiple",
+            "readonly": false,
+            "required": false,
+            "value": [
+                "web",
+                "store"
+            ]
+        },
+        "categoryId": {
+            "type": "autocomplete",
+            "name": "categoryId",
+            "label": "category",
+            "route": "catalogue-category-search",
+            "parameter": "query",
+            "mode": "single",
+            "readonly": false,
+            "required": false,
+            "value": [
+                3
+            ]
+        },
+        "active": {
+            "type": "bool",
+            "name": "active",
+            "label": "active",
+            "readonly": false,
+            "required": false,
+            "value": true
+        },
+        "availableFrom": {
+            "type": "date",
+            "name": "availableFrom",
+            "label": "available from",
+            "format": "Y-m-d",
+            "min": null,
+            "max": null,
+            "readonly": false,
+            "required": false,
+            "value": "2026-09-01"
+        },
+        "publishedAt": {
+            "type": "dateTime",
+            "name": "publishedAt",
+            "label": "published at",
+            "format": "Y-m-d H:i",
+            "min": null,
+            "max": null,
+            "readonly": false,
+            "required": false,
+            "value": "2026-08-30 14:25"
+        },
+        "dimensions": {
+            "type": "collection",
+            "name": "dimensions",
+            "label": "dimensions in centimetres",
+            "elements": {
+                "width": {
+                    "type": "number",
+                    "name": "width",
+                    "label": "width",
+                    "min": 0.0,
+                    "max": null,
+                    "step": null,
+                    "readonly": false,
+                    "required": false,
+                    "value": 40.0
+                },
+                "height": {
+                    "type": "number",
+                    "name": "height",
+                    "label": "height",
+                    "min": 0.0,
+                    "max": null,
+                    "step": null,
+                    "readonly": false,
+                    "required": false,
+                    "value": 55.0
+                },
+                "depth": {
+                    "type": "number",
+                    "name": "depth",
+                    "label": "depth",
+                    "min": 0.0,
+                    "max": null,
+                    "step": null,
+                    "readonly": false,
+                    "required": false,
+                    "value": 20.0
+                }
+            }
+        },
+        "prices": {
+            "type": "prototypeCollection",
+            "name": "prices",
+            "label": "prices per currency",
+            "key": "prices",
+            "elements": [
+                {
+                    "currency": {
+                        "type": "array",
+                        "name": "currency",
+                        "label": "currency",
+                        "options": {
+                            "EUR": "Euro",
+                            "RON": "Romanian leu"
+                        },
+                        "mode": "single",
+                        "readonly": false,
+                        "required": false,
+                        "value": [
+                            "EUR"
+                        ]
+                    },
+                    "amount": {
+                        "type": "number",
+                        "name": "amount",
+                        "label": "amount",
+                        "min": 0.0,
+                        "max": null,
+                        "step": null,
+                        "readonly": false,
+                        "required": false,
+                        "value": 30.5
+                    }
+                },
+                {
+                    "currency": {
+                        "type": "array",
+                        "name": "currency",
+                        "label": "currency",
+                        "options": {
+                            "EUR": "Euro",
+                            "RON": "Romanian leu"
+                        },
+                        "mode": "single",
+                        "readonly": false,
+                        "required": false,
+                        "value": [
+                            "RON"
+                        ]
+                    },
+                    "amount": {
+                        "type": "number",
+                        "name": "amount",
+                        "label": "amount",
+                        "min": 0.0,
+                        "max": null,
+                        "step": null,
+                        "readonly": false,
+                        "required": false,
+                        "value": 149.9
+                    }
+                }
+            ],
+            "prototype": {
+                "currency": {
+                    "type": "array",
+                    "name": "currency",
+                    "label": "currency",
+                    "options": {
+                        "EUR": "Euro",
+                        "RON": "Romanian leu"
+                    },
+                    "mode": "single",
+                    "readonly": false,
+                    "required": false,
+                    "value": null
+                },
+                "amount": {
+                    "type": "number",
+                    "name": "amount",
+                    "label": "amount",
+                    "min": 0.0,
+                    "max": null,
+                    "step": null,
+                    "readonly": false,
+                    "required": false,
+                    "value": null
+                }
+            }
+        },
+        "image": {
+            "type": "file",
+            "name": "image",
+            "label": "image",
+            "readonly": false,
+            "required": false
+        }
+    }
+}
