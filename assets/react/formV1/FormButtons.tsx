@@ -6,8 +6,8 @@ import LanguageContext from '../context/LanguageContext';
 import logger from '../service/Logger';
 import type {NullaryType} from '../type/Function';
 import {FormControl} from './FormControl';
-import {ButtonTypeEnum} from './Types';
 import type {ButtonListType, FormType} from './Types';
+import {ButtonTypeEnum} from './Types';
 
 type FormButtonsProps = {
     form: FormType

@@ -1,8 +1,8 @@
-import {TextField as TextFieldBase} from '@mui/material';
 import type {InputLabelProps} from '@mui/material';
+import {TextField as TextFieldBase} from '@mui/material';
 import type {InputProps as StandardInputProps} from '@mui/material/Input/Input';
-import React from 'react';
 import type {HTMLInputTypeAttribute} from 'react';
+import React from 'react';
 import type {FieldType} from './Types';
 
 type TextFieldProps = FieldType & {

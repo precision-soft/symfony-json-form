@@ -4,8 +4,8 @@
 
 import React from 'react';
 import {Form as FormV1} from '../../../assets/react/formV1/Form';
-import {ButtonTypeEnum, Form as FormV2} from '../../../assets/react/formV2/Form';
 import type {ButtonListType, FormDataType} from '../../../assets/react/formV2/Form';
+import {ButtonTypeEnum, Form as FormV2} from '../../../assets/react/formV2/Form';
 
 type ProductEditorProps = {
     data: FormDataType

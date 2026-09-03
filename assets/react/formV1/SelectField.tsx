@@ -7,8 +7,8 @@ import type {StringArrayType} from '../type/Array';
 import type {MapType} from '../type/Map';
 import type {NullableStringType, StringNumberType} from '../type/Scalar';
 import {FormControl} from './FormControl';
-import {ElementModeEnum} from './Types';
 import type {FieldType, OnChangeAutocompleteType, SelectOptionsType} from './Types';
+import {ElementModeEnum} from './Types';
 
 type SelectFieldProps = FieldType & {
     options: SelectOptionsType

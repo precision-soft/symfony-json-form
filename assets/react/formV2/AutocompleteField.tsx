@@ -4,8 +4,8 @@ import React from 'react';
 import {useUrlGeneratorContext} from '../context/UrlGeneratorContext';
 import {HttpRequest, HttpRequestTypeEnum, useHttpClient} from '../service/HttpClient';
 import type {NullableStringType} from '../type/Scalar';
-import {ElementModeEnum} from './Form';
 import type {FieldType, OnChangeAutocompleteType, OnChangeEventType} from './Form';
+import {ElementModeEnum} from './Form';
 
 type AutocompleteFieldProps = FieldType & {
     mode: ElementModeEnum

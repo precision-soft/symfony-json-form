@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import React from 'react';
-import AlertContext from '../context/AlertContext';
 import type {AlertContextType} from '../context/AlertContext';
+import AlertContext from '../context/AlertContext';
 import UserContext from '../context/UserContext';
 import type {FormDataType} from '../form/Form';
 import type {NullableStringArrayType} from '../type/Array';

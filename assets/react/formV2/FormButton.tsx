@@ -5,8 +5,8 @@ import Icon from '../component/Icon';
 import {useLanguageContext} from '../context/LanguageContext';
 import logger from '../service/Logger';
 import type {NullaryType} from '../type/Function';
-import {ButtonTypeEnum, FormContext, FormControl} from './Form';
 import type {ButtonListType} from './Form';
+import {ButtonTypeEnum, FormContext, FormControl} from './Form';
 
 type FormButtonProps = {
     buttons?: ButtonListType

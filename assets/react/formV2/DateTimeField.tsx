@@ -2,8 +2,8 @@ import {TextField as TextFieldBase} from '@mui/material';
 import {DateTimePicker, LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import React from 'react';
-import {FormBuilder} from './Form';
 import type {FieldType} from './Form';
+import {FormBuilder} from './Form';
 
 type DateTimeFieldProps = FieldType & {
     format: string

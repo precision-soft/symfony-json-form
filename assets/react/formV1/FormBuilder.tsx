@@ -1,6 +1,6 @@
 import {Box} from '@mui/material';
-import {FastField} from 'formik';
 import type {FormikValues} from 'formik';
+import {FastField} from 'formik';
 import React from 'react';
 import {computeInitialValues, createPrototypeCollectionElementValues, requireElementProperty} from '../service/Element';
 import {clone} from '../service/Utility';

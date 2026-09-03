@@ -1,6 +1,6 @@
 import {Box, Checkbox, FormControlLabel} from '@mui/material';
-import {FastField, FieldArray} from 'formik';
 import type {FormikValues} from 'formik';
+import {FastField, FieldArray} from 'formik';
 import React from 'react';
 import LanguageContext from '../context/LanguageContext';
 import Exception from '../exception/Exception';
@@ -15,8 +15,8 @@ import {FormBuilder} from './FormBuilder';
 import {FormControl} from './FormControl';
 import {SelectField} from './SelectField';
 import {TextField} from './TextField';
-import {ElementModeEnum, ElementTypeEnum} from './Types';
 import type {ElementListType, ElementType, FormFieldCallbacksType, FormFieldRenderPropsType, FormFieldsCallbacksType, FormFieldsRenderPropsType, FormFieldValueType, FormType, OnChangeCallbackType} from './Types';
+import {ElementModeEnum, ElementTypeEnum} from './Types';
 
 type FormFieldProps = {
     form: FormType

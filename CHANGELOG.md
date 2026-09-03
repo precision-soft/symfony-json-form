@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [v1.3.0] - 2026-09-03 - Json bodies denormalized as json, subclass dtos accepted, type-only imports in the react sources, and the example application
+
 ### Added
 
 - `.example/`, a runnable product editor: three form services on the product nomenclator that use every element type the package ships, a value object built through the context hooks, and the react half that renders the same json with both `formV1` and `formV2` and derives its initial values from it — gated by `.dev/validate/all.sh --example` and the `example` CI job, `export-ignore`d ([`.example/README.md`](./.example/README.md))
@@ -236,7 +238,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - React form components (formV1, formV2) with TypeScript types, autocomplete, date, datetime, select, and collection field support
 - Docker-based development environment with git hooks
 
-[Unreleased]: https://github.com/precision-soft/symfony-json-form/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/precision-soft/symfony-json-form/compare/v1.3.0...HEAD
+
+[v1.3.0]: https://github.com/precision-soft/symfony-json-form/compare/v1.2.0...v1.3.0
 
 [v1.2.0]: https://github.com/precision-soft/symfony-json-form/compare/v1.1.0...v1.2.0
 
