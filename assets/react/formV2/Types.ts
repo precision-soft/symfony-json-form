@@ -1,13 +1,13 @@
-import {SelectChangeEvent} from '@mui/material/Select/SelectInput';
-import {AutocompleteChangeDetails, AutocompleteChangeReason} from '@mui/material/useAutocomplete';
-import {FormikProps, FormikValues} from 'formik';
+import type {SelectChangeEvent} from '@mui/material/Select/SelectInput';
+import type {AutocompleteChangeDetails, AutocompleteChangeReason} from '@mui/material/useAutocomplete';
+import type {FormikProps, FormikValues} from 'formik';
 import React from 'react';
 import {HttpRequestTypeEnum} from '../service/HttpClient';
-import {NullableStringArrayType, StringArrayType} from '../type/Array';
-import {NullaryType} from '../type/Function';
-import {MapType, NullableMapType} from '../type/Map';
-import {BooleanRefType} from '../type/React';
-import {NullableStringType, StringNumberType} from '../type/Scalar';
+import type {NullableStringArrayType, StringArrayType} from '../type/Array';
+import type {NullaryType} from '../type/Function';
+import type {MapType, NullableMapType} from '../type/Map';
+import type {BooleanRefType} from '../type/React';
+import type {NullableStringType, StringNumberType} from '../type/Scalar';
 
 export enum ElementTypeEnum {
     ARRAY = 'array',

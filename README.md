@@ -22,6 +22,8 @@ A form is described by three pieces that you provide per form:
 
 `render()` serializes the form (plus the DTO values) to a json structure for the frontend; `handleRequest()` takes the incoming request, sanitizes it, and denormalizes it back into the DTO.
 
+`render()` builds a dto through `getDtoClass()` when none is given, so a dto must be constructible without arguments; one that is not is reported as the package's `Exception` (`constructDto()` is the hook to build it differently).
+
 ### V1 vs V2
 
 There are 2 versions of the react renderer. They consume the **same** backend json — only the frontend components differ:
@@ -212,7 +214,8 @@ Each element renders to a json node with a `type` the frontend dispatches on. Al
   `request->all()` when the body is empty).
 * A request body that decodes to a non-array scalar (e.g. `5`) throws an `Exception` rather than a raw `TypeError`, and so does the form's own key inside it (e.g. `{"myForm": "text"}`).
 * Pass an existing `$dto` to populate it in place (`OBJECT_TO_POPULATE`) — useful for `PATCH`/`PUT`.
-* A `$dto` whose class is not the form's `getDtoClass()` throws an `Exception`, the same guard `render()` has always had. Previously the serializer dropped it silently, returned a freshly constructed dto and left the object you passed untouched.
+* A `$dto` that is not an instance of the form's `getDtoClass()` throws an `Exception`, the same guard `render()` has always had; a subclass of the dto is accepted and populated in place. Previously the serializer dropped a mismatched dto silently, returned a freshly constructed dto and left the object you passed untouched.
+* The json body of a `POST`/`PUT`/`PATCH` request is denormalized **as json** (`hasJsonBody()`), so the serializer applies its json rules — a whole number such as `150` lands in a `float` property. `GET` and form-encoded input carry strings only; they are denormalized with no format and with the type enforcement disabled.
 
 When `$sanitizeData` is `true` (default), `sanitizeData()` applies the following rules before denormalization:
 
@@ -263,7 +266,7 @@ PHP tests run in the dev container:
 ./dc exec dev php vendor/bin/simple-phpunit
 ```
 
-`composer test` excludes the `integration` group; `composer test-integration` runs only it. The integration suite (`tests/Functional/`) drives the whole round trip with nothing mocked — a form service renders a DTO to json, that json comes back as a real request body, and the service denormalizes it into a DTO again. It needs no external service.
+The suite is written on [`precision-soft/symfony-phpunit`](https://github.com/precision-soft/symfony-phpunit): every test class extends `AbstractTestCase` and declares its subject or collaborator through `getMockDto()`; `AbstractFormServiceTest` drives the form services against a Mockery double of the Symfony `Serializer` (the class implements the three interfaces the intersection type demands), so an expectation the code does not meet fails the test. `composer test` excludes the `integration` group; `composer test-integration` runs only it. The integration suite (`tests/Functional/`) drives the whole round trip with nothing mocked — a form service renders a DTO to json, that json comes back as a real request body, and the service denormalizes it into a DTO again. It needs no external service.
 
 The framework-agnostic react asset services (`service/Element.ts`, `service/Utility.ts`) are covered by a dependency-free harness using Node's built-in test runner (the dev container ships Node):
 
@@ -277,6 +280,8 @@ The react sources are type-checked with `tsc --noEmit`. There is no build step a
 ```shell
 ./dc exec dev sh -c 'cd assets/react && npm run typecheck'
 ```
+
+The sources import types with `import type`, and the typecheck runs with `verbatimModuleSyntax`, so a host bundling them with a compiler that does not elide unused imports — or with `verbatimModuleSyntax` of its own — meets no type-only import at run time.
 
 ## Exception context
 
@@ -299,6 +304,10 @@ What this package attaches: `AbstractFormService::getDataAndContext()` reports `
 Every exception in the package implements `Contract\ExceptionInterface`, so a consumer can read the context off any of them without knowing the concrete class. A subclass of your own that already declares a `$context` property or a
 `getContext()`/`setContext()` method will collide with `Exception\Trait\ExceptionTrait`.
 
+## Example application
+
+A runnable product editor lives under [`.example/`](./.example/README.md): three form services on the product nomenclator that use every element type the package ships, a value object built through the context hooks, and the react half that renders the same json with both `formV1` and `formV2` and derives its initial values from it — the minimum of code that shows the maximum of the library, with a test for every scenario. It installs the package from the working tree through a path repository, so it always tests the code as it stands; run it with `.dev/validate/all.sh --example` or `cd .example && composer install && composer check`, then `cd assets/react && npm run typecheck && node --test` for the react half. The directory is `export-ignore`d and never reaches a consumer's `vendor/`.
+
 ## Dev
 
 ```shell
@@ -315,6 +324,7 @@ Run the full gate the way the pre-commit hook runs it - the CI workflow in
 .dev/validate/all.sh
 .dev/validate/all.sh --integration   # also runs the integration suite
 .dev/validate/all.sh --audit         # also audits the locked dependencies ( needs the network )
+.dev/validate/all.sh --example       # also installs and checks the example application under .example/, php and react halves
 .dev/validate/all.sh --staged        # what the pre-commit hook runs: only the languages the index touches
 ```
 

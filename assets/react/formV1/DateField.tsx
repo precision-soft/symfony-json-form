@@ -3,7 +3,7 @@ import {DesktopDatePicker, LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import React from 'react';
 import {FormBuilder} from './FormBuilder';
-import {FieldType} from './Types';
+import type {FieldType} from './Types';
 
 type DateFieldProps = FieldType & {
     format: string

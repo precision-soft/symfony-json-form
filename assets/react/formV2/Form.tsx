@@ -1,19 +1,20 @@
 import '../../../css/shared/form.scss';
 import {Box} from '@mui/material';
-import {Form as FormBase, Formik, FormikValues, useFormikContext} from 'formik';
+import type {FormikValues} from 'formik';
+import {Form as FormBase, Formik, useFormikContext} from 'formik';
 import React from 'react';
 import {BlockUi} from '../component/BlockUi';
 import {useUrlGeneratorContext} from '../context/UrlGeneratorContext';
 import {computeInitialValues, createPrototypeCollectionElementValues} from '../service/Element';
 import {HttpRequest, useHttpClient} from '../service/HttpClient';
-import {StringArrayType} from '../type/Array';
-import {NullaryType, SetLoadingType} from '../type/Function';
-import {MapType} from '../type/Map';
-import {BooleanRefType} from '../type/React';
-import {StringNumberType} from '../type/Scalar';
+import type {StringArrayType} from '../type/Array';
+import type {NullaryType, SetLoadingType} from '../type/Function';
+import type {MapType} from '../type/Map';
+import type {BooleanRefType} from '../type/React';
+import type {StringNumberType} from '../type/Scalar';
 import {FormButton} from './FormButton';
 import {FormFields, FormFieldsContainer} from './FormField';
-import {ButtonListType, ElementListType, FormDataType, FormRenderPropsType, FormType, OnSubmitFailureType, OnSubmitSuccessType} from './Types';
+import type {ButtonListType, ElementListType, FormDataType, FormRenderPropsType, FormType, OnSubmitFailureType, OnSubmitSuccessType} from './Types';
 
 export * from './Types';
 export * from './AutocompleteField';

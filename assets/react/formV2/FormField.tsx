@@ -1,13 +1,15 @@
 import {Box, Checkbox, FormControl as FormControlBase, FormControlLabel} from '@mui/material';
-import {FastField, FormikValues} from 'formik';
+import type {FormikValues} from 'formik';
+import {FastField} from 'formik';
 import React from 'react';
 import {useLanguageContext} from '../context/LanguageContext';
 import Exception from '../exception/Exception';
 import {requireElementProperty} from '../service/Element';
-import {StringArrayType} from '../type/Array';
-import {BooleanRefType} from '../type/React';
-import {NullableStringType} from '../type/Scalar';
-import {AutocompleteField, DateField, DateTimeField, ElementListType, ElementModeEnum, ElementType, ElementTypeEnum, FormBuilder, FormContext, FormFieldRenderPropsType, FormFieldsRenderPropsType, FormFieldValueType, OnChangeCallbackType, SelectField, TextField} from './Form';
+import type {StringArrayType} from '../type/Array';
+import type {BooleanRefType} from '../type/React';
+import type {NullableStringType} from '../type/Scalar';
+import type {ElementListType, ElementType, FormFieldRenderPropsType, FormFieldsRenderPropsType, FormFieldValueType, OnChangeCallbackType} from './Form';
+import {AutocompleteField, DateField, DateTimeField, ElementModeEnum, ElementTypeEnum, FormBuilder, FormContext, SelectField, TextField} from './Form';
 import {PrototypeCollectionField} from './PrototypeCollectionField';
 
 type FormControlProps = React.PropsWithChildren & {

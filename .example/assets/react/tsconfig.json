@@ -1,0 +1,12 @@
+{
+    "extends": "../../../assets/react/tsconfig.json",
+    "compilerOptions": {
+        "resolveJsonModule": true
+    },
+    "include": [
+        "**/*.ts",
+        "**/*.tsx",
+        "../../../assets/react/**/*.ts",
+        "../../../assets/react/**/*.tsx"
+    ]
+}

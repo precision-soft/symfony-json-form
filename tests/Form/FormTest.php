@@ -9,30 +9,42 @@ declare(strict_types=1);
 namespace PrecisionSoft\Symfony\JsonForm\Test\Form;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
 use PrecisionSoft\Symfony\JsonForm\Exception\Exception;
+use PrecisionSoft\Symfony\JsonForm\Test\Utility\SerializerFactory;
 use PrecisionSoft\Symfony\JsonForm\Test\Utility\TestDto;
 use PrecisionSoft\Symfony\JsonForm\Test\Utility\TestForm;
 use PrecisionSoft\Symfony\JsonForm\Test\Utility\TestMethodForm;
 use PrecisionSoft\Symfony\JsonForm\Test\Utility\TestPostForm;
+use PrecisionSoft\Symfony\JsonForm\Test\Utility\TestProductFormService;
+use PrecisionSoft\Symfony\JsonForm\Test\Utility\TestSanitizingForm;
+use PrecisionSoft\Symfony\Phpunit\MockDto;
+use PrecisionSoft\Symfony\Phpunit\TestCase\AbstractTestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
-use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
-use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
 
 /**
  * @internal
  */
-final class FormTest extends TestCase
+final class FormTest extends AbstractTestCase
 {
+    public static function getMockDto(): MockDto
+    {
+        return new MockDto(TestForm::class);
+    }
+
+    /** @return array<string, array{string}> */
+    public static function provideBodyCarryingRequestMethods(): array
+    {
+        return [
+            'post' => [Request::METHOD_POST],
+            'put' => [Request::METHOD_PUT],
+            'patch' => [Request::METHOD_PATCH],
+        ];
+    }
+
     public function testRender(): void
     {
         $testForm = new TestForm();
-        $testForm->setSerializer($this->getSerializer());
+        $testForm->setSerializer(SerializerFactory::create());
 
         $form = $testForm->render();
 
@@ -60,10 +72,18 @@ final class FormTest extends TestCase
         static::assertSame('test', $form['elements']['string']['value']);
     }
 
+    public function testTheFormNameDropsTheServiceSuffix(): void
+    {
+        $testProductFormService = new TestProductFormService();
+        $testProductFormService->setSerializer(SerializerFactory::create());
+
+        static::assertSame('testProductForm', $testProductFormService->render()['name']);
+    }
+
     public function testHandle(): void
     {
         $testForm = new TestForm();
-        $testForm->setSerializer($this->getSerializer());
+        $testForm->setSerializer(SerializerFactory::create());
 
         $request = new Request();
 
@@ -76,7 +96,7 @@ final class FormTest extends TestCase
     public function testABodyCarryingRequestMethodIsDecodedFromTheJsonPayload(string $requestMethod): void
     {
         $methodForm = (new TestMethodForm())->setMethod($requestMethod);
-        $methodForm->setSerializer($this->getSerializer());
+        $methodForm->setSerializer(SerializerFactory::create());
 
         $request = new Request(
             server: ['REQUEST_METHOD' => $requestMethod],
@@ -92,7 +112,7 @@ final class FormTest extends TestCase
     public function testHandleRequestSanitizesByDefaultAndSkipsItOnRequest(): void
     {
         $methodForm = (new TestMethodForm())->setMethod(Request::METHOD_POST);
-        $methodForm->setSerializer($this->getSerializer());
+        $methodForm->setSerializer(SerializerFactory::create());
 
         $requestFactory = static fn(): Request => new Request(
             server: ['REQUEST_METHOD' => Request::METHOD_POST],
@@ -114,25 +134,10 @@ final class FormTest extends TestCase
         static::assertSame([], $unsanitizedDto->getArray());
     }
 
-    /** @return array<string, array{string}> */
-    public static function provideBodyCarryingRequestMethods(): array
-    {
-        return [
-            'post' => [Request::METHOD_POST],
-            'put' => [Request::METHOD_PUT],
-            'patch' => [Request::METHOD_PATCH],
-        ];
-    }
-
     public function testHandleThrowsExceptionForScalarRequestBody(): void
     {
-        $postForm = new class extends TestForm {
-            protected function getMethod(): string
-            {
-                return Request::METHOD_POST;
-            }
-        };
-        $postForm->setSerializer($this->getSerializer());
+        $postForm = new TestPostForm();
+        $postForm->setSerializer(SerializerFactory::create());
 
         $request = new Request(content: '5');
 
@@ -144,13 +149,8 @@ final class FormTest extends TestCase
 
     public function testHandleThrowsExceptionForMalformedJsonBody(): void
     {
-        $postForm = new class extends TestForm {
-            protected function getMethod(): string
-            {
-                return Request::METHOD_POST;
-            }
-        };
-        $postForm->setSerializer($this->getSerializer());
+        $postForm = new TestPostForm();
+        $postForm->setSerializer(SerializerFactory::create());
 
         $request = new Request(content: '{"invalid": ');
 
@@ -164,7 +164,7 @@ final class FormTest extends TestCase
     public function testMalformedJsonBodyCarriesTheFormNameAndRequestMethodInTheExceptionContext(): void
     {
         $postForm = new TestPostForm();
-        $postForm->setSerializer($this->getSerializer());
+        $postForm->setSerializer(SerializerFactory::create());
 
         $request = new Request(
             server: ['REQUEST_METHOD' => Request::METHOD_POST],
@@ -182,13 +182,14 @@ final class FormTest extends TestCase
             );
 
             static::assertSame('request body for form `testPostForm` is not valid JSON', $exception->getMessage());
+            static::assertSame(0, $exception->getCode());
         }
     }
 
     public function testHandleThrowsExceptionForScalarFormKey(): void
     {
         $postForm = new TestPostForm();
-        $postForm->setSerializer($this->getSerializer());
+        $postForm->setSerializer(SerializerFactory::create());
 
         $request = new Request(content: '{"testPostForm": "not-an-array"}');
 
@@ -200,17 +201,7 @@ final class FormTest extends TestCase
 
     public function testSanitizeDataKeepsEmptyStringsButDropsEmptyArrays(): void
     {
-        $form = new class extends TestForm {
-            /**
-             * @param array<string, mixed> $data
-             *
-             * @return array<string, mixed>
-             */
-            public function exposeSanitizeData(array $data): array
-            {
-                return $this->sanitizeData($data);
-            }
-        };
+        $form = new TestSanitizingForm();
 
         $sanitizedData = $form->exposeSanitizeData([
             'string' => '',
@@ -225,16 +216,4 @@ final class FormTest extends TestCase
         static::assertSame(['inner' => ''], $sanitizedData['nested']);
     }
 
-    private function getSerializer(): Serializer
-    {
-        $propertyInfoExtractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
-        $normalizers = [
-            new ArrayDenormalizer(),
-            new ObjectNormalizer(null, null, null, $propertyInfoExtractor),
-        ];
-
-        $encoders = [new JsonEncoder()];
-
-        return new Serializer($normalizers, $encoders);
-    }
 }

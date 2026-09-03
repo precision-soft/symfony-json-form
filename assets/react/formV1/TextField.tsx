@@ -1,7 +1,9 @@
-import {InputLabelProps, TextField as TextFieldBase} from '@mui/material';
-import {InputProps as StandardInputProps} from '@mui/material/Input/Input';
-import React, {HTMLInputTypeAttribute} from 'react';
-import {FieldType} from './Types';
+import type {InputLabelProps} from '@mui/material';
+import {TextField as TextFieldBase} from '@mui/material';
+import type {InputProps as StandardInputProps} from '@mui/material/Input/Input';
+import type {HTMLInputTypeAttribute} from 'react';
+import React from 'react';
+import type {FieldType} from './Types';
 
 type TextFieldProps = FieldType & {
     type: HTMLInputTypeAttribute

@@ -5,7 +5,7 @@ import router from '../../../../public/bundles/fosjsrouting/js/router';
 // @ts-ignore host provided
 import routes from '../../../../public/js/fos_js_routes.json';
 import LanguageContext from '../context/LanguageContext';
-import {NullableMapType} from '../type/Map';
+import type {NullableMapType} from '../type/Map';
 
 router.setRoutingData(routes);
 

@@ -6,6 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [v1.3.0] - 2026-09-03 - Json bodies denormalized as json, subclass dtos accepted, type-only imports in the react sources, and the example application
+
+### Added
+
+- `.example/`, a runnable product editor: three form services on the product nomenclator that use every element type the package ships, a value object built through the context hooks, and the react half that renders the same json with both `formV1` and `formV2` and derives its initial values from it — gated by `.dev/validate/all.sh --example` and the `example` CI job, `export-ignore`d ([`.example/README.md`](./.example/README.md))
+- `AbstractFormService::hasJsonBody()` and `AbstractFormService::constructDto()`, the two decisions `handleRequest()` and `render()` now take through an overridable method
+
+### Fixed
+
+- `handleRequest()` tells the serializer that a request body is json: it decoded the body itself and then denormalized it with no format, which switched off the serializer's own json number handling — a whole number such as `150`, which is what every JavaScript client sends for `150.0`, was refused for a `float` property with *the type of the "price" attribute must be one of "float" ("int" given)*. `GET` and form-encoded input are still denormalized without a format
+- `render()` and `handleRequest()` accept a subclass of the form's dto again: the guard `handleRequest()` gained in v1.2.0 compared the class names, so a subclass passed to populate in place — which v1.1.0 accepted — was refused as *invalid dto class*. Both guards are `instanceof` now; the exception and its context are unchanged for a dto of another class
+- `render()` reports a dto that cannot be built without arguments as the package's `Exception` (context `formName` and `dtoClass`, the constructor error as previous) instead of a raw `ArgumentCountError`
+
+### Changed
+
+- The react sources import types with `import type`, and `assets/react/tsconfig.json` sets `verbatimModuleSyntax` so the typecheck refuses a type-only import written without it: a host bundling the sources with that option, or with a compiler that does not elide unused imports, no longer fails on them
+- The test suite is written on `precision-soft/symfony-phpunit` — `AbstractTestCase` and `MockDto` everywhere, a Mockery double of the Symfony `Serializer` whose expectations are verified — and that package moved from v3.6.0 to v3.7.0; `phpstan/phpstan-mockery` joined `require-dev` for it
+
 ## [v1.2.0] - 2026-09-01 - Serializer context hooks for value objects, and Symfony 8 support
 
 ### Added
@@ -220,7 +238,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - React form components (formV1, formV2) with TypeScript types, autocomplete, date, datetime, select, and collection field support
 - Docker-based development environment with git hooks
 
-[Unreleased]: https://github.com/precision-soft/symfony-json-form/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/precision-soft/symfony-json-form/compare/v1.3.0...HEAD
+
+[v1.3.0]: https://github.com/precision-soft/symfony-json-form/compare/v1.2.0...v1.3.0
 
 [v1.2.0]: https://github.com/precision-soft/symfony-json-form/compare/v1.1.0...v1.2.0
 

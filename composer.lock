@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "73c8f76e7918278b27da6a403701ebb8",
+    "content-hash": "68469d28f18d7ceb63e666e090a42b0c",
     "packages": [
         {
             "name": "symfony/deprecation-contracts",
@@ -1784,6 +1784,55 @@
             "time": "2026-08-31T19:09:43+00:00"
         },
         {
+            "name": "phpstan/phpstan-mockery",
+            "version": "2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phpstan/phpstan-mockery.git",
+                "reference": "89a949d0ac64298e88b7c7fa00caee565c198394"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpstan/phpstan-mockery/zipball/89a949d0ac64298e88b7c7fa00caee565c198394",
+                "reference": "89a949d0ac64298e88b7c7fa00caee565c198394",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4 || ^8.0",
+                "phpstan/phpstan": "^2.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.6.11",
+                "php-parallel-lint/php-parallel-lint": "^1.2",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpstan/phpstan-strict-rules": "^2.0",
+                "phpunit/phpunit": "^9.6"
+            },
+            "type": "phpstan-extension",
+            "extra": {
+                "phpstan": {
+                    "includes": [
+                        "extension.neon"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "PHPStan\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "PHPStan Mockery extension",
+            "support": {
+                "issues": "https://github.com/phpstan/phpstan-mockery/issues",
+                "source": "https://github.com/phpstan/phpstan-mockery/tree/2.0.0"
+            },
+            "time": "2024-10-14T03:18:12+00:00"
+        },
+        {
             "name": "phpunit/php-code-coverage",
             "version": "11.0.12",
             "source": {
@@ -2226,16 +2275,16 @@
         },
         {
             "name": "precision-soft/symfony-phpunit",
-            "version": "v3.6.0",
+            "version": "v3.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/precision-soft/symfony-phpunit.git",
-                "reference": "0c9eabd6c0452a0e943ea83c50c7c26c73f93cb8"
+                "reference": "308a04c6b8d9fe087b34b2e2aa5f684995501c60"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/precision-soft/symfony-phpunit/zipball/0c9eabd6c0452a0e943ea83c50c7c26c73f93cb8",
-                "reference": "0c9eabd6c0452a0e943ea83c50c7c26c73f93cb8",
+                "url": "https://api.github.com/repos/precision-soft/symfony-phpunit/zipball/308a04c6b8d9fe087b34b2e2aa5f684995501c60",
+                "reference": "308a04c6b8d9fe087b34b2e2aa5f684995501c60",
                 "shasum": ""
             },
             "require": {
@@ -2245,7 +2294,7 @@
                 "symfony/string": "^7.0 || ^8.0"
             },
             "require-dev": {
-                "doctrine/doctrine-bundle": "^2.0",
+                "doctrine/doctrine-bundle": "^2.0 || ^3.0",
                 "doctrine/orm": "^3.0",
                 "friendsofphp/php-cs-fixer": "^3.0",
                 "phpstan/phpstan": "^2.0",
@@ -2282,9 +2331,9 @@
             ],
             "support": {
                 "issues": "https://github.com/precision-soft/symfony-phpunit/issues",
-                "source": "https://github.com/precision-soft/symfony-phpunit/tree/v3.6.0"
+                "source": "https://github.com/precision-soft/symfony-phpunit/tree/v3.7.0"
             },
-            "time": "2026-08-31T19:31:28+00:00"
+            "time": "2026-09-02T11:56:29+00:00"
         },
         {
             "name": "psr/container",

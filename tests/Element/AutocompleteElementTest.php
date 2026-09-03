@@ -8,15 +8,21 @@ declare(strict_types=1);
 
 namespace PrecisionSoft\Symfony\JsonForm\Test\Element;
 
-use PHPUnit\Framework\TestCase;
 use PrecisionSoft\Symfony\JsonForm\Element\AutocompleteElement;
 use PrecisionSoft\Symfony\JsonForm\Exception\InvalidModeException;
+use PrecisionSoft\Symfony\Phpunit\MockDto;
+use PrecisionSoft\Symfony\Phpunit\TestCase\AbstractTestCase;
 
 /**
  * @internal
  */
-final class AutocompleteElementTest extends TestCase
+final class AutocompleteElementTest extends AbstractTestCase
 {
+    public static function getMockDto(): MockDto
+    {
+        return new MockDto(AutocompleteElement::class);
+    }
+
     public function testRenderWithNullValue(): void
     {
         $autocompleteElement = new AutocompleteElement('city', 'label', 'city_search');

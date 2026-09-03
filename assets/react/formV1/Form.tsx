@@ -5,13 +5,13 @@ import React from 'react';
 import {BlockUi} from '../component/BlockUi';
 import {HttpRequest, useHttpClient} from '../service/HttpClient';
 import useUrlGenerator from '../service/UrlGenerator';
-import {NullaryType, SetLoadingType} from '../type/Function';
-import {MapType} from '../type/Map';
-import {BooleanRefType} from '../type/React';
+import type {NullaryType, SetLoadingType} from '../type/Function';
+import type {MapType} from '../type/Map';
+import type {BooleanRefType} from '../type/React';
 import {FormBuilder} from './FormBuilder';
 import {FormButtons} from './FormButtons';
 import {FormFields, FormFieldsContainer} from './FormField';
-import {ButtonListType, ElementListType, FormCallbacksType, FormDataType, FormRenderPropsType, FormType, OnSubmitFailureType, OnSubmitSuccessType} from './Types';
+import type {ButtonListType, ElementListType, FormCallbacksType, FormDataType, FormRenderPropsType, FormType, OnSubmitFailureType, OnSubmitSuccessType} from './Types';
 
 export * from './Types';
 export * from './FormBuilder';

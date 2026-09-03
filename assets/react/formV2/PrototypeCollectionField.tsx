@@ -1,11 +1,13 @@
 import {Box} from '@mui/material';
-import {FieldArray, FormikValues} from 'formik';
+import type {FormikValues} from 'formik';
+import {FieldArray} from 'formik';
 import React from 'react';
 import {requireElementProperty} from '../service/Element';
 import {clone} from '../service/Utility';
-import {StringArrayType} from '../type/Array';
-import {NullableNumberType} from '../type/Scalar';
-import {ElementListType, ElementType, FormBuilder, FormContext, FormFieldRenderPropsType, FormFields, FormFieldValueType, PrototypeCollectionModifiersType, PrototypeCollectionType} from './Form';
+import type {StringArrayType} from '../type/Array';
+import type {NullableNumberType} from '../type/Scalar';
+import type {ElementListType, ElementType, FormFieldRenderPropsType, FormFieldValueType, PrototypeCollectionModifiersType, PrototypeCollectionType} from './Form';
+import {FormBuilder, FormContext, FormFields} from './Form';
 
 type PrototypeCollectionDefaultFieldProps = {
     collectionElements: PrototypeCollectionType[]

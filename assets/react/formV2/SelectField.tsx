@@ -1,12 +1,13 @@
 import {Autocomplete as AutocompleteBase, Box, Checkbox, Chip, InputLabel, ListItemText, ListSubheader, MenuItem, OutlinedInput, Select, TextField as TextFieldBase} from '@mui/material';
-import {AutocompleteValue as AutocompleteValueBase} from '@mui/material/useAutocomplete';
+import type {AutocompleteValue as AutocompleteValueBase} from '@mui/material/useAutocomplete';
 import React from 'react';
 import {useLanguageContext} from '../context/LanguageContext';
 import Exception from '../exception/Exception';
-import {StringArrayType} from '../type/Array';
-import {MapType} from '../type/Map';
-import {NullableStringType, StringNumberType} from '../type/Scalar';
-import {ElementModeEnum, FieldType, FormControl, OnChangeAutocompleteType, SelectOptionsType} from './Form';
+import type {StringArrayType} from '../type/Array';
+import type {MapType} from '../type/Map';
+import type {NullableStringType, StringNumberType} from '../type/Scalar';
+import type {FieldType, OnChangeAutocompleteType, SelectOptionsType} from './Form';
+import {ElementModeEnum, FormControl} from './Form';
 
 type SelectFieldProps = FieldType & {
     options: SelectOptionsType
@@ -133,7 +134,7 @@ export const SelectField: React.FunctionComponent<SelectFieldProps> = (props) =>
                             renderValue={(selected: StringArrayType) => (
                                 <Box className="d-flex flex-wrap gap-2">
                                     {selected.map((value) => (
-                                        <Chip key={value} label={<>{processedOptions.indexed[value]}</>} sx={{height: '22px'}}/>
+                                        <Chip key={value} label={<React.Fragment>{processedOptions.indexed[value]}</React.Fragment>} sx={{height: '22px'}}/>
                                     ))}
                                 </Box>
                             )}

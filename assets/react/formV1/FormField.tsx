@@ -1,12 +1,13 @@
 import {Box, Checkbox, FormControlLabel} from '@mui/material';
-import {FastField, FieldArray, FormikValues} from 'formik';
+import type {FormikValues} from 'formik';
+import {FastField, FieldArray} from 'formik';
 import React from 'react';
 import LanguageContext from '../context/LanguageContext';
 import Exception from '../exception/Exception';
 import {requireElementProperty} from '../service/Element';
-import {StringArrayType} from '../type/Array';
-import {BooleanRefType} from '../type/React';
-import {NullableNumberType, NullableStringType} from '../type/Scalar';
+import type {StringArrayType} from '../type/Array';
+import type {BooleanRefType} from '../type/React';
+import type {NullableNumberType, NullableStringType} from '../type/Scalar';
 import {AutocompleteField} from './AutocompleteField';
 import {DateField} from './DateField';
 import {DateTimeField} from './DateTimeField';
@@ -14,7 +15,8 @@ import {FormBuilder} from './FormBuilder';
 import {FormControl} from './FormControl';
 import {SelectField} from './SelectField';
 import {TextField} from './TextField';
-import {ElementListType, ElementModeEnum, ElementType, ElementTypeEnum, FormFieldCallbacksType, FormFieldRenderPropsType, FormFieldsCallbacksType, FormFieldsRenderPropsType, FormFieldValueType, FormType, OnChangeCallbackType} from './Types';
+import type {ElementListType, ElementType, FormFieldCallbacksType, FormFieldRenderPropsType, FormFieldsCallbacksType, FormFieldsRenderPropsType, FormFieldValueType, FormType, OnChangeCallbackType} from './Types';
+import {ElementModeEnum, ElementTypeEnum} from './Types';
 
 type FormFieldProps = {
     form: FormType

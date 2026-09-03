@@ -9,17 +9,23 @@ declare(strict_types=1);
 namespace PrecisionSoft\Symfony\JsonForm\Test\Exception;
 
 use Exception as BaseException;
-use PHPUnit\Framework\TestCase;
 use PrecisionSoft\Symfony\JsonForm\Contract\ExceptionInterface;
 use PrecisionSoft\Symfony\JsonForm\Exception\Exception;
 use PrecisionSoft\Symfony\JsonForm\Exception\InvalidModeException;
 use PrecisionSoft\Symfony\JsonForm\Exception\InvalidValueException;
+use PrecisionSoft\Symfony\Phpunit\MockDto;
+use PrecisionSoft\Symfony\Phpunit\TestCase\AbstractTestCase;
 
 /**
  * @internal
  */
-final class ExceptionTest extends TestCase
+final class ExceptionTest extends AbstractTestCase
 {
+    public static function getMockDto(): MockDto
+    {
+        return new MockDto(Exception::class);
+    }
+
     public function testExceptionExtendsBaseException(): void
     {
         $exception = new Exception('test message');

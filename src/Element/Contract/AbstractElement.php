@@ -12,15 +12,15 @@ use PrecisionSoft\Symfony\JsonForm\Exception\Exception;
 
 abstract class AbstractElement
 {
-    public function __construct(
-        protected readonly string $name,
-        protected readonly ?string $label,
-    ) {}
-
     abstract protected function getType(): string;
 
     /** @return array<string, mixed> */
     abstract protected function renderElement(mixed $value): array;
+
+    public function __construct(
+        protected readonly string $name,
+        protected readonly ?string $label,
+    ) {}
 
     public function getName(): string
     {

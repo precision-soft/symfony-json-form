@@ -8,17 +8,23 @@ declare(strict_types=1);
 
 namespace PrecisionSoft\Symfony\JsonForm\Test\Trait;
 
-use PHPUnit\Framework\TestCase;
 use PrecisionSoft\Symfony\JsonForm\Element\StringElement;
 use PrecisionSoft\Symfony\JsonForm\Exception\Exception;
 use PrecisionSoft\Symfony\JsonForm\Form\Action;
 use PrecisionSoft\Symfony\JsonForm\Form\Form;
+use PrecisionSoft\Symfony\Phpunit\MockDto;
+use PrecisionSoft\Symfony\Phpunit\TestCase\AbstractTestCase;
 
 /**
  * @internal
  */
-final class ElementCollectionTraitTest extends TestCase
+final class ElementCollectionTraitTest extends AbstractTestCase
 {
+    public static function getMockDto(): MockDto
+    {
+        return new MockDto(Form::class);
+    }
+
     public function testAddElementReturnsStaticForChaining(): void
     {
         $form = new Form('testform', 'GET', new Action('route'));

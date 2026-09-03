@@ -1,6 +1,7 @@
 import {Box} from '@mui/material';
 import React from 'react';
-import {default as Icon, NameType} from '../component/Icon';
+import type {NameType} from '../component/Icon';
+import {default as Icon} from '../component/Icon';
 
 type IconProps = {
     name: NameType

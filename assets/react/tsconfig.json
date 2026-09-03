@@ -18,6 +18,9 @@
         // with no defect behind it. strictNullChecks - the part of `strict` this gate exists for - is
         // unaffected.
         "noImplicitAny": false,
+        // A type-only import written without `type` is elided by tsc but not by every bundler a host
+        // may use; this makes the compiler refuse it, so the sources ship with the `type` keyword.
+        "verbatimModuleSyntax": true,
         "noEmit": true,
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,

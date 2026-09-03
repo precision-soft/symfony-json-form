@@ -9,22 +9,19 @@ declare(strict_types=1);
 namespace PrecisionSoft\Symfony\JsonForm\Test\Functional;
 
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\TestCase;
+use PrecisionSoft\Symfony\JsonForm\Test\Utility\SerializerFactory;
 use PrecisionSoft\Symfony\JsonForm\Test\Utility\TestDateDto;
 use PrecisionSoft\Symfony\JsonForm\Test\Utility\TestDatePostForm;
 use PrecisionSoft\Symfony\JsonForm\Test\Utility\TestDateTimeDto;
 use PrecisionSoft\Symfony\JsonForm\Test\Utility\TestDateTimePostForm;
 use PrecisionSoft\Symfony\JsonForm\Test\Utility\TestDto;
+use PrecisionSoft\Symfony\JsonForm\Test\Utility\TestDtoChild;
 use PrecisionSoft\Symfony\JsonForm\Test\Utility\TestPostForm;
+use PrecisionSoft\Symfony\JsonForm\Test\Utility\TestPriceDto;
+use PrecisionSoft\Symfony\JsonForm\Test\Utility\TestPricePostForm;
+use PrecisionSoft\Symfony\Phpunit\MockDto;
+use PrecisionSoft\Symfony\Phpunit\TestCase\AbstractTestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
-use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
-use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
-use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
 
 /**
  * The round trip with nothing mocked: render a dto to json, submit that json back, denormalize it again.
@@ -32,8 +29,13 @@ use Symfony\Component\Serializer\Serializer;
  * @internal
  */
 #[Group('integration')]
-final class FormRoundTripFunctionalTest extends TestCase
+final class FormRoundTripFunctionalTest extends AbstractTestCase
 {
+    public static function getMockDto(): MockDto
+    {
+        return new MockDto(TestPostForm::class);
+    }
+
     public function testRenderedValuesSubmitBackIntoAnEquivalentDto(): void
     {
         $form = $this->getForm();
@@ -65,7 +67,7 @@ final class FormRoundTripFunctionalTest extends TestCase
 
     public function testDateTimeValueRoundTripsThroughTheConfiguredWireFormat(): void
     {
-        $form = (new TestDateTimePostForm())->setSerializer($this->getSerializer());
+        $form = (new TestDateTimePostForm())->setSerializer(SerializerFactory::create());
 
         $source = new TestDateTimeDto();
         $rendered = $form->render($source);
@@ -80,7 +82,7 @@ final class FormRoundTripFunctionalTest extends TestCase
 
     public function testADateOnlyWireFormatDenormalizesToMidnightRatherThanTheCurrentClock(): void
     {
-        $form = (new TestDatePostForm())->setSerializer($this->getSerializer());
+        $form = (new TestDatePostForm())->setSerializer(SerializerFactory::create());
 
         $rendered = $form->render(new TestDateDto());
 
@@ -139,6 +141,27 @@ final class FormRoundTripFunctionalTest extends TestCase
         static::assertSame('test', $dto->getString());
     }
 
+    public function testASubclassOfTheFormDtoIsPopulatedInPlace(): void
+    {
+        $form = $this->getForm();
+        $testDtoChild = (new TestDtoChild())->setString('before');
+
+        $populated = $form->handleRequest($this->getRequest('testPostForm', ['string' => 'after']), $testDtoChild);
+
+        static::assertSame($testDtoChild, $populated);
+        static::assertSame('after', $testDtoChild->getString());
+    }
+
+    public function testAWholeNumberFromAJsonBodyLandsInAFloatProperty(): void
+    {
+        $form = (new TestPricePostForm())->setSerializer(SerializerFactory::create());
+
+        $dto = $form->handleRequest($this->getRequest('testPricePostForm', ['price' => 150]));
+
+        static::assertInstanceOf(TestPriceDto::class, $dto);
+        static::assertSame(150.0, $dto->getPrice());
+    }
+
     /** @param array<string, mixed> $data */
     private function getRequest(string $formName, array $data): Request
     {
@@ -147,20 +170,7 @@ final class FormRoundTripFunctionalTest extends TestCase
 
     private function getForm(): TestPostForm
     {
-        return (new TestPostForm())->setSerializer($this->getSerializer());
+        return (new TestPostForm())->setSerializer(SerializerFactory::create());
     }
 
-    private function getSerializer(): Serializer
-    {
-        $propertyInfoExtractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
-
-        return new Serializer(
-            [
-                new DateTimeNormalizer(),
-                new ArrayDenormalizer(),
-                new ObjectNormalizer(null, null, null, $propertyInfoExtractor),
-            ],
-            [new JsonEncoder()],
-        );
-    }
 }

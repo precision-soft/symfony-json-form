@@ -1,12 +1,13 @@
 import $ from 'jquery';
 import React from 'react';
-import AlertContext, {AlertContextType} from '../context/AlertContext';
+import type {AlertContextType} from '../context/AlertContext';
+import AlertContext from '../context/AlertContext';
 import UserContext from '../context/UserContext';
-import {FormDataType} from '../form/Form';
-import {NullableStringArrayType} from '../type/Array';
-import {NullableNullaryType, NullaryType} from '../type/Function';
-import {MapType, NullableMapType} from '../type/Map';
-import {NullableStringType} from '../type/Scalar';
+import type {FormDataType} from '../form/Form';
+import type {NullableStringArrayType} from '../type/Array';
+import type {NullableNullaryType, NullaryType} from '../type/Function';
+import type {MapType, NullableMapType} from '../type/Map';
+import type {NullableStringType} from '../type/Scalar';
 import logger from './Logger';
 
 type ResponseType = MapType & {
