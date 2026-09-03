@@ -1,10 +1,11 @@
 import {Autocomplete as AutocompleteBase, TextField as TextFieldBase} from '@mui/material';
-import {AutocompleteInputChangeReason, AutocompleteValue as AutocompleteValueBase} from '@mui/material/useAutocomplete';
+import type {AutocompleteInputChangeReason, AutocompleteValue as AutocompleteValueBase} from '@mui/material/useAutocomplete';
 import React from 'react';
 import {useUrlGeneratorContext} from '../context/UrlGeneratorContext';
 import {HttpRequest, HttpRequestTypeEnum, useHttpClient} from '../service/HttpClient';
-import {NullableStringType} from '../type/Scalar';
-import {ElementModeEnum, FieldType, OnChangeAutocompleteType, OnChangeEventType} from './Form';
+import type {NullableStringType} from '../type/Scalar';
+import {ElementModeEnum} from './Form';
+import type {FieldType, OnChangeAutocompleteType, OnChangeEventType} from './Form';
 
 type AutocompleteFieldProps = FieldType & {
     mode: ElementModeEnum

@@ -1,4 +1,4 @@
-import {StringNumberType} from './Scalar';
+import type {StringNumberType} from './Scalar';
 
 export type MapType<T = unknown> = {
     [key: StringNumberType]: T

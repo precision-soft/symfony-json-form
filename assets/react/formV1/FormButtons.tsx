@@ -4,9 +4,10 @@ import {buttonErrorOutlined, resetSecondary, submitPrimaryOutlined} from '../com
 import Icon from '../component/Icon';
 import LanguageContext from '../context/LanguageContext';
 import logger from '../service/Logger';
-import {NullaryType} from '../type/Function';
+import type {NullaryType} from '../type/Function';
 import {FormControl} from './FormControl';
-import {ButtonListType, ButtonTypeEnum, FormType} from './Types';
+import {ButtonTypeEnum} from './Types';
+import type {ButtonListType, FormType} from './Types';
 
 type FormButtonsProps = {
     form: FormType

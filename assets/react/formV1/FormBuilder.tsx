@@ -1,13 +1,14 @@
 import {Box} from '@mui/material';
-import {FastField, FormikValues} from 'formik';
+import {FastField} from 'formik';
+import type {FormikValues} from 'formik';
 import React from 'react';
 import {computeInitialValues, createPrototypeCollectionElementValues, requireElementProperty} from '../service/Element';
 import {clone} from '../service/Utility';
-import {StringArrayType} from '../type/Array';
-import {MapType} from '../type/Map';
-import {StringNumberType} from '../type/Scalar';
+import type {StringArrayType} from '../type/Array';
+import type {MapType} from '../type/Map';
+import type {StringNumberType} from '../type/Scalar';
 import {FormFields} from './FormField';
-import {ElementListType, ElementType, FormCallbacksType, FormFieldCallbacksType, FormFieldRenderPropsType, FormFieldValueType, FormType, PrototypeCollectionType} from './Types';
+import type {ElementListType, ElementType, FormCallbacksType, FormFieldCallbacksType, FormFieldRenderPropsType, FormFieldValueType, FormType, PrototypeCollectionType} from './Types';
 
 export class FormBuilder {
     static computeDateFormat = (elementFormat: string): string => {

@@ -4,7 +4,7 @@ import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
 import React from 'react';
-import {StringArrayType} from '../type/Array';
+import type {StringArrayType} from '../type/Array';
 
 type BlockUiProps = React.PropsWithChildren & {
     open: boolean
