@@ -8,15 +8,21 @@ declare(strict_types=1);
 
 namespace PrecisionSoft\Symfony\JsonForm\Test\Element;
 
-use PHPUnit\Framework\TestCase;
 use PrecisionSoft\Symfony\JsonForm\Element\NumberElement;
 use PrecisionSoft\Symfony\JsonForm\Exception\InvalidValueException;
+use PrecisionSoft\Symfony\Phpunit\MockDto;
+use PrecisionSoft\Symfony\Phpunit\TestCase\AbstractTestCase;
 
 /**
  * @internal
  */
-final class NumberElementTest extends TestCase
+final class NumberElementTest extends AbstractTestCase
 {
+    public static function getMockDto(): MockDto
+    {
+        return new MockDto(NumberElement::class);
+    }
+
     public function testRenderWithNullValue(): void
     {
         $numberElement = new NumberElement('count', 'label');

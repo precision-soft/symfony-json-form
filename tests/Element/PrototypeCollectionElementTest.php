@@ -8,16 +8,22 @@ declare(strict_types=1);
 
 namespace PrecisionSoft\Symfony\JsonForm\Test\Element;
 
-use PHPUnit\Framework\TestCase;
 use PrecisionSoft\Symfony\JsonForm\Element\PrototypeCollectionElement;
 use PrecisionSoft\Symfony\JsonForm\Element\StringElement;
 use PrecisionSoft\Symfony\JsonForm\Exception\InvalidValueException;
+use PrecisionSoft\Symfony\Phpunit\MockDto;
+use PrecisionSoft\Symfony\Phpunit\TestCase\AbstractTestCase;
 
 /**
  * @internal
  */
-final class PrototypeCollectionElementTest extends TestCase
+final class PrototypeCollectionElementTest extends AbstractTestCase
 {
+    public static function getMockDto(): MockDto
+    {
+        return new MockDto(PrototypeCollectionElement::class);
+    }
+
     public function testRenderWithNullValueExposesPrototypeOnly(): void
     {
         $prototypeCollectionElement = new PrototypeCollectionElement('items', 'label');

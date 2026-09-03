@@ -8,15 +8,21 @@ declare(strict_types=1);
 
 namespace PrecisionSoft\Symfony\JsonForm\Test\Element;
 
-use PHPUnit\Framework\TestCase;
 use PrecisionSoft\Symfony\JsonForm\Element\DateTimeElement;
 use PrecisionSoft\Symfony\JsonForm\Exception\InvalidValueException;
+use PrecisionSoft\Symfony\Phpunit\MockDto;
+use PrecisionSoft\Symfony\Phpunit\TestCase\AbstractTestCase;
 
 /**
  * @internal
  */
-final class DateTimeElementTest extends TestCase
+final class DateTimeElementTest extends AbstractTestCase
 {
+    public static function getMockDto(): MockDto
+    {
+        return new MockDto(DateTimeElement::class);
+    }
+
     public function testConstructWithUnparsableMinThrowsException(): void
     {
         static::expectException(InvalidValueException::class);

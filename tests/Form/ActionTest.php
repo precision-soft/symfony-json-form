@@ -8,14 +8,20 @@ declare(strict_types=1);
 
 namespace PrecisionSoft\Symfony\JsonForm\Test\Form;
 
-use PHPUnit\Framework\TestCase;
 use PrecisionSoft\Symfony\JsonForm\Form\Action;
+use PrecisionSoft\Symfony\Phpunit\MockDto;
+use PrecisionSoft\Symfony\Phpunit\TestCase\AbstractTestCase;
 
 /**
  * @internal
  */
-final class ActionTest extends TestCase
+final class ActionTest extends AbstractTestCase
 {
+    public static function getMockDto(): MockDto
+    {
+        return new MockDto(Action::class);
+    }
+
     public function testRenderWithoutParameters(): void
     {
         $action = new Action('app_user_create');

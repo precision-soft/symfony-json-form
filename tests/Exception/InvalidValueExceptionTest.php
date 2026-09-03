@@ -8,16 +8,22 @@ declare(strict_types=1);
 
 namespace PrecisionSoft\Symfony\JsonForm\Test\Exception;
 
-use PHPUnit\Framework\TestCase;
 use PrecisionSoft\Symfony\JsonForm\Exception\Exception;
 use PrecisionSoft\Symfony\JsonForm\Exception\InvalidValueException;
+use PrecisionSoft\Symfony\Phpunit\MockDto;
+use PrecisionSoft\Symfony\Phpunit\TestCase\AbstractTestCase;
 use stdClass;
 
 /**
  * @internal
  */
-final class InvalidValueExceptionTest extends TestCase
+final class InvalidValueExceptionTest extends AbstractTestCase
 {
+    public static function getMockDto(): MockDto
+    {
+        return new MockDto(InvalidValueException::class);
+    }
+
     public function testMessageWithScalarValue(): void
     {
         $invalidValueException = new InvalidValueException('fieldname', 'badvalue');

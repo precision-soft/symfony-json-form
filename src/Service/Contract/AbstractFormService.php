@@ -45,11 +45,7 @@ abstract class AbstractFormService
     /** @return array<string, mixed> */
     public function render(?DtoInterface $dto = null): array
     {
-        if (null === $dto) {
-            $dtoClass = $this->getDtoClass();
-            /** @var DtoInterface $dto */
-            $dto = new $dtoClass();
-        }
+        $dto ??= $this->constructDto();
 
         $this->validateDtoClass($dto);
 
@@ -85,19 +81,41 @@ abstract class AbstractFormService
             $context[AbstractNormalizer::OBJECT_TO_POPULATE] = $dto;
         }
 
-        return $this->serializer->denormalize($data, $this->getDtoClass(), null, $context);
+        $format = true === $this->hasJsonBody($request) ? JsonEncoder::FORMAT : null;
+
+        return $this->serializer->denormalize($data, $this->getDtoClass(), $format, $context);
     }
 
     protected function validateDtoClass(DtoInterface $dto): void
     {
-        if ($dto::class !== $this->getDtoClass()) {
+        $dtoClass = $this->getDtoClass();
+
+        if (false === $dto instanceof $dtoClass) {
             throw (new Exception(\sprintf('invalid dto class for form `%s`', $this->getName())))
                 ->setContext([
                     'formName' => $this->getName(),
                     'dtoClass' => $dto::class,
-                    'expectedDtoClass' => $this->getDtoClass(),
+                    'expectedDtoClass' => $dtoClass,
                 ]);
         }
+    }
+
+    protected function constructDto(): DtoInterface
+    {
+        $dtoClass = $this->getDtoClass();
+
+        try {
+            /** @var DtoInterface $dto */
+            $dto = new $dtoClass();
+        } catch (Throwable $throwable) {
+            throw (new Exception(
+                \sprintf('the dto of form `%s` can not be built without arguments', $this->getName()),
+                0,
+                $throwable,
+            ))->setContext(['formName' => $this->getName(), 'dtoClass' => $dtoClass]);
+        }
+
+        return $dto;
     }
 
     /** @return array{array<string, mixed>, array<string, mixed>} the form's own payload, and the denormalization context */
@@ -113,10 +131,9 @@ abstract class AbstractFormService
             case Request::METHOD_POST:
             case Request::METHOD_PUT:
             case Request::METHOD_PATCH:
-                $requestContent = $request->getContent();
-                if (false === empty($requestContent)) {
+                if (true === $this->hasJsonBody($request)) {
                     try {
-                        $data = (new JsonEncoder())->decode($requestContent, JsonEncoder::FORMAT);
+                        $data = (new JsonEncoder())->decode($request->getContent(), JsonEncoder::FORMAT);
                     } catch (Throwable $throwable) {
                         throw new Exception(
                             \sprintf('request body for form `%s` is not valid JSON', $this->getName()),
@@ -154,6 +171,14 @@ abstract class AbstractFormService
         }
 
         return [$formData, $context];
+    }
+
+    /** a body-carrying method with a non-empty body: the payload is json, and the serializer must know it is */
+    protected function hasJsonBody(Request $request): bool
+    {
+        $bodyCarryingMethods = [Request::METHOD_POST, Request::METHOD_PUT, Request::METHOD_PATCH];
+
+        return true === \in_array($this->getMethod(), $bodyCarryingMethods, true) && false === empty($request->getContent());
     }
 
     /** @return array<string, mixed> */

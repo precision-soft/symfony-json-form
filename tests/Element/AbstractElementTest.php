@@ -8,16 +8,23 @@ declare(strict_types=1);
 
 namespace PrecisionSoft\Symfony\JsonForm\Test\Element;
 
-use PHPUnit\Framework\TestCase;
+use PrecisionSoft\Symfony\JsonForm\Element\Contract\AbstractElement;
 use PrecisionSoft\Symfony\JsonForm\Element\LabelElement;
 use PrecisionSoft\Symfony\JsonForm\Element\StringElement;
 use PrecisionSoft\Symfony\JsonForm\Exception\Exception;
+use PrecisionSoft\Symfony\Phpunit\MockDto;
+use PrecisionSoft\Symfony\Phpunit\TestCase\AbstractTestCase;
 
 /**
  * @internal
  */
-final class AbstractElementTest extends TestCase
+final class AbstractElementTest extends AbstractTestCase
 {
+    public static function getMockDto(): MockDto
+    {
+        return new MockDto(AbstractElement::class);
+    }
+
     public function testGetName(): void
     {
         $stringElement = new StringElement('myfield', 'label');
